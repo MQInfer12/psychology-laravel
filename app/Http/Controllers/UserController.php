@@ -116,4 +116,9 @@ class UserController extends Controller
 
         return response()->json(["mensaje" => "se actualizo correctamente"], 201);
     }
+
+    public function destroy($id)
+    {
+        return User::destroy($id);
+    }
 }
