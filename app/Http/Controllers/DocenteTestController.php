@@ -69,7 +69,7 @@ class DocenteTestController extends Controller
         return response()->json($getProfessorsNotAssigning);
     }
 
-    public function getProfessorAssigning($id)
+    public function getProfessorAssigning($id) //BUSCAR DOCENTES ASIGNADOS PARA DESASIGNARLOS
     {
         $getIdDocente = DB::select("select * from docente_tests where id_test=$id");
         $vec = [];
@@ -78,7 +78,7 @@ class DocenteTestController extends Controller
             where u.id_rol=2 and u.id_sede=s.id and u.id=$idProfessor->id_docente");
             foreach($aux as $profesor) {
                 if($profesor->perfil != null) {
-                    $profesor->perfil = stream_get_contents($profesor->perfil);
+                    $profesor->perfil = "pendiente...";
                 }
             }
             $vec = array_merge_recursive($vec, $aux);
