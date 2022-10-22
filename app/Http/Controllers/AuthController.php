@@ -106,6 +106,7 @@ class AuthController extends Controller
             'id_sede' => 'required',
             'id_rol' => 'required',
             'estado' => 'required',
+            'perfil' => null,
         ]);
         
         if($validator->fails()) {
