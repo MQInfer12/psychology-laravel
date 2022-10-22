@@ -53,7 +53,7 @@ class AuthController extends Controller
     {
         $usuario = auth()->user();
         if($usuario->perfil != null) {
-            $usuario->perfil = stream_get_contents($usuario -> perfil);
+            $usuario->perfil = "pendiente...";
         }
         
         return response()->json(auth()->user());
