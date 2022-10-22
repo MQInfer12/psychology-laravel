@@ -30,7 +30,7 @@ class DocenteTestController extends Controller
         return DocenteTest::find($id);
     }
 
-    public function getProfessorNotAssigning($id)
+    public function getProfessorNotAssigning($id) //BUSCAR DOCENTES SIN ASIGNAR PARA ASIGNARLOS
     {
         $getIdDocente = DB::select("select * from docente_tests where id_test=$id");
         $getIdsany = true;
@@ -50,7 +50,7 @@ class DocenteTestController extends Controller
 
             foreach($getProfessorsNotAssigning as $profesor) {
                 if($profesor->perfil != null) {
-                    $profesor->perfil = stream_get_contents($profesor->perfil);
+                    $profesor->perfil = "pendiente...";
                 }
             }
         } else {
@@ -61,7 +61,7 @@ class DocenteTestController extends Controller
 
             foreach($getProfessorsNotAssigning as $profesor) {
                 if($profesor->perfil != null) {
-                    $profesor->perfil = stream_get_contents($profesor->perfil);
+                    $profesor->perfil = "pendiente...";
                 }
             }
         }
