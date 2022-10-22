@@ -49,7 +49,7 @@ class UserController extends Controller
     {
         $usuario = DB::select("SELECT perfil from users where id='$id'");
         $foto = stream_get_contents($usuario[0]->perfil);
-        return $foto;
+        return response()->json(["perfil" => $foto], 201);
     }
 
     public function store(Request $request)
