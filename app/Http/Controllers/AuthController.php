@@ -120,6 +120,6 @@ class AuthController extends Controller
         return response()->json([
             'message' => '¡Registro correcto!',
             'user' => $user
-        ], 201);
+        ], 209);
     }
 }
