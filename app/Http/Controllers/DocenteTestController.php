@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class DocenteTestController extends Controller
 {
-    public function index($id) //PEDIR TODOS LOS TESTS EN EL ADMINISTRADOR
+    public function index($id) //PEDIR LOS TESTS EN EL DOCENTE
     {
         $showTests = DB::select(
             "SELECT dt.id, u.email, u.perfil,
@@ -19,7 +19,7 @@ class DocenteTestController extends Controller
 
         foreach ($showTests as $user) {
             if ($user->perfil != null) {
-               $user->perfil = "pendiente...";
+                $user->perfil = "pendiente...";
             }
         }
         return response()->json($showTests);
