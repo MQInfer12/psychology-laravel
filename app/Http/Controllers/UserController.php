@@ -103,7 +103,7 @@ class UserController extends Controller
 
         $user->save();
 
-        return response()->json(["mensaje" => "se actualizo correctamente"], 201);
+        return response()->json(["mensaje" => "se actualizo correctamente", "user" => $user], 209);
     }
 
     public function able($id)
