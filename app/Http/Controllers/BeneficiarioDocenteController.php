@@ -33,7 +33,7 @@ class BeneficiarioDocenteController extends Controller
     public function getBenefAssigning($id) //BENEFICIARIOS ASIGNADOS PARA DESASIGNARLOS
     {
         $getIdDocente = DB::select("SELECT bdt.id, bdt.email_user, bdt.id_docente_test, u.email, 
-                                    u.nombre as nombre_user, s.nombre as sede, u.perfil
+                                    u.id as id_user, u.nombre as nombre_user, s.nombre as sede, u.perfil
                                     from respuestas as bdt, users u, sedes as s
                                     where bdt.email_user=u.email and s.id=u.id_sede and bdt.id_docente_test=$id");
 
