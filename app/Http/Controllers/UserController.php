@@ -100,8 +100,11 @@ class UserController extends Controller
         $user->genero = $request->genero;
         $user->edad = $request->edad;
         $user->id_sede = $request->id_sede;
-
         $user->save();
+
+        if($user->perfil != null) {
+            $user->perfil = "pendiente...";
+        }
 
         return response()->json(["mensaje" => "se actualizo correctamente", "user" => $user], 209);
     }
