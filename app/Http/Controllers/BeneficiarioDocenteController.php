@@ -16,7 +16,7 @@ class BeneficiarioDocenteController extends Controller
 
         foreach($tests as $test) {
             $id_dt = $test->id;
-            $usuarios = DB::select("SELECT u.nombre, u.perfil
+            $usuarios = DB::select("SELECT u.id, u.nombre, u.perfil
                                     FROM users as u, respuestas as r, docente_tests as dt
                                     WHERE r.email_user = u.email AND r.id_docente_test=dt.id AND dt.id='$id_dt'");
             foreach($usuarios as $usuario) {
