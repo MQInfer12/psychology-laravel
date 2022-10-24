@@ -155,7 +155,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => env('.web.app'), //SESSION_DOMAIN
 
     /*
     |--------------------------------------------------------------------------
