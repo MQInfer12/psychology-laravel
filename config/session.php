@@ -155,7 +155,7 @@ return [
     |
     */
 
-    'domain' => env('psicologiaunifranz.herokuapp.com'),
+    'domain' => env('SESSION_DOMAIN'),
 
     /*
     |--------------------------------------------------------------------------
