@@ -155,7 +155,7 @@ return [
     |
     */
 
-    'domain' => env('chat-6f082.web.app'),
+    'domain' => env('psicologiaunifranz.herokuapp.com'),
 
     /*
     |--------------------------------------------------------------------------
