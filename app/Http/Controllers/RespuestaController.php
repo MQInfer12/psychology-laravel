@@ -46,6 +46,16 @@ class RespuestaController extends Controller
 
         return $respuestas;
     }
+    
+    public function myProffessors($email) 
+    {
+        $proffessors = DB::select("SELECT d.id, d.nombre, d.email
+                                   FROM users d, respuestas r, docente_tests dt
+                                   WHERE r.email_user='$email'
+                                   AND r.id_docente_test=dt.id
+                                   AND dt.id_docente=d.id");
+        return $proffessors;
+    }
 
     public function getRespuestasByDocente($id)
     {
