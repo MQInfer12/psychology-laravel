@@ -21,11 +21,12 @@ class CitaController extends Controller
         return $appointments;
     }
 
-    public function allAppointmentsAvailables()
+    public function allAppointmentsAvailables($email) //LLENAR HORARIOS LIBRES PARA LOS BENEFICIARIOS
     {
-        $appointments = DB::select("SELECT h.id, h.fecha, h.hora_inicio, h.hora_final, h.disponible, u.email, u.nombre 
-                                    from horarios h, users u 
-                                    where h.id_docente=u.id and h.disponible=true");
+        $appointments = DB::select("SELECT h.id, h.fecha, h.hora_inicio, h.hora_final, h.disponible, d.email, d.nombre
+                                    FROM horarios h, users d, respuestas r, docente_tests dt
+                                    WHERE r.email_user='$email' AND
+                                    WHERE h.id_docente=d.id AND h.disponible=true");
         foreach($appointments as $appointment) {
             $appointment->fecha = date_create($appointment->fecha);
             $appointment->fecha = date_format($appointment->fecha, "d/m/Y");
