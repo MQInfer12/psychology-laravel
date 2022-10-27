@@ -30,9 +30,9 @@ class AuthController extends Controller
     {
         $email = request('email');
         $autorizado = DB::select("SELECT estado FROM users WHERE email='$email'");
-        
-        if($autorizado != []) {
-            if(!$autorizado[0]->estado) {
+
+        if ($autorizado != []) {
+            if (!$autorizado[0]->estado) {
                 return response()->json(['error' => 'No se puede ingresar a esta cuenta'], 403);
             }
         }
@@ -42,20 +42,21 @@ class AuthController extends Controller
             return response()->json(['error' => 'Correo o contraseña incorrectos'], 401);
         }
 
-        return $this->respondWithToken($token);
+        //  return $this->respondWithToken($token);
+        return response()->json(["token" => $token]);
     }
     /**
      * Get the authenticated User.
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me()
+    public function me(Request $request)
     {
         $usuario = auth()->user();
-        if($usuario->perfil != null) {
+        if ($usuario->perfil != null) {
             $usuario->perfil = "pendiente...";
         }
-        
+
         return response()->json(auth()->user());
     }
 
@@ -67,8 +68,9 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->logout();
-        $cookie = Cookie::forget('jwt');
-        return response()->json(['message' => 'Successfully logged out'])->withCookie($cookie);
+        //$cookie = Cookie::forget('jwt');
+       // return response()->json(['message' => 'Successfully logged out'])->withCookie($cookie);
+       return response()->json(['message' => 'Successfully logged out']);
     }
 
     /**
@@ -88,16 +90,17 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token)
+ /*    protected function respondWithToken($token)
     {
         $cookie = cookie('jwt', $token, 60 * 24);
         return response()->json([
             'message' => "Logged succesfully",
         ])->withCookie($cookie);
-    }
-
-    public function register(Request $request) {
-        $validator = Validator::make($request -> all(), [
+    } 
+ */
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
             'nombre' => 'required',
             'email' => 'required',
             'password' => 'required',
@@ -107,8 +110,8 @@ class AuthController extends Controller
             'id_rol' => 'required',
             'estado' => 'required',
         ]);
-        
-        if($validator->fails()) {
+
+        if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
 
@@ -116,7 +119,7 @@ class AuthController extends Controller
             $validator->validate(),
             ['password' => bcrypt($request->password)]
         ));
-    
+
         return response()->json([
             'message' => '¡Registro correcto!',
             'user' => $user

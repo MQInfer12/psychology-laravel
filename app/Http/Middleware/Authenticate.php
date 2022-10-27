@@ -15,17 +15,22 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        if (! $request->expectsJson()) {
+        if (!$request->expectsJson()) {
             return route('login');
         }
     }
 
     public function handle($request, Closure $next, ...$guards)
     {
-        if($jwt = $request->cookie('jwt')) {
+      /*  if ($jwt = $request->cookie('jwt')) {
             $request->headers->set('Authorization', 'Bearer ' . $jwt);
-        }
+        }*/
 
+        $header = $request->header('token');
+        if ($header == "") {
+            return response()->json(["message" => "you can't send the token empty"]);
+        }
+        $request->headers->set('Authorization', 'Bearer ' . $header);
         $this->authenticate($request, $guards);
 
         return $next($request);
