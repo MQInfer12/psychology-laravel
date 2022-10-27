@@ -25,8 +25,11 @@ class CitaController extends Controller
     {
         $appointments = DB::select("SELECT h.id, h.fecha, h.hora_inicio, h.hora_final, h.disponible, d.email, d.nombre
                                     FROM horarios h, users d, respuestas r, docente_tests dt
-                                    WHERE r.email_user='$email' AND
-                                    h.id_docente=d.id AND h.disponible=true");
+                                    WHERE r.email_user='$email'
+                                    AND r.id_docente_test=dt.id
+                                    AND dt.id_docente=d.id
+                                    AND h.id_docente=d.id 
+                                    AND h.disponible=true");
         foreach($appointments as $appointment) {
             $appointment->fecha = date_create($appointment->fecha);
             $appointment->fecha = date_format($appointment->fecha, "d/m/Y");
