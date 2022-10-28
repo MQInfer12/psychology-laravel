@@ -64,7 +64,7 @@ class RespuestaController extends Controller
             "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
                     u.nombre as nombre_user,
                     d.nombre as nombre_docente, d.email as email_docente,
-                    t.id as id_test, t.nombre as nombre_test, t.descripcion
+                    t.id as id_test, t.nombre as nombre_test, t.descripcion,
                     CASE WHEN r.estado=1 THEN 'Recibido' WHEN r.estado=0 THEN 'Pendiente' END
             FROM respuestas as r, docente_tests as dt, users as d, users as u, tests as t
             WHERE dt.id=r.id_docente_test AND d.id=dt.id_docente AND u.email=r.email_user AND t.id=dt.id_test AND dt.id_docente='$id'
