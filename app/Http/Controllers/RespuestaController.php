@@ -15,19 +15,20 @@ class RespuestaController extends Controller
             "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
                     u.nombre as nombre_user,
                     d.nombre as nombre_docente, d.email as email_docente,
-                    t.id as id_test, t.nombre as nombre_test, t.descripcion
+                    t.id as id_test, t.nombre as nombre_test, t.descripcion, 
+                    CASE WHEN r.estado=1 THEN 'Recibido' WHEN r.estado=2 THEN 'Pendiente' END
             FROM respuestas as r, docente_tests as dt, users as d, users as u, tests as t
             WHERE dt.id=r.id_docente_test AND d.id=dt.id_docente AND u.email=r.email_user AND t.id=dt.id_test
             ORDER BY id"
         );
-        
-        foreach($respuestas as $respuesta) {
+
+        foreach ($respuestas as $respuesta) {
             //CONSEGUIR PUNTUACION TOTAL
             $secciones = DB::select("SELECT id FROM seccions WHERE id_test='$respuesta->id_test'");
             $total = 0;
-            foreach($secciones as $seccion) {                
+            foreach ($secciones as $seccion) {
                 $preguntas = DB::select("SELECT id FROM preguntas WHERE id_seccion='$seccion->id'");
-                foreach($preguntas as $pregunta) {
+                foreach ($preguntas as $pregunta) {
                     $max = DB::select("SELECT MAX(asignado) FROM puntuacions WHERE id_pregunta='$pregunta->id'");
                     $total = $total + $max[0]->max;
                 }
@@ -37,7 +38,7 @@ class RespuestaController extends Controller
             //CONSEGUIR PUNTUACION DEL TEST
             $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$respuesta->id'");
             $cont = 0;
-            foreach($resultados as $resultado) {
+            foreach ($resultados as $resultado) {
                 $puntuacion = DB::select("SELECT asignado FROM puntuacions WHERE id='$resultado->id_puntuacion'");
                 $cont = $cont + $puntuacion[0]->asignado;
             }
@@ -46,8 +47,8 @@ class RespuestaController extends Controller
 
         return $respuestas;
     }
-    
-    public function myProffessors($email) 
+
+    public function myProffessors($email)
     {
         $proffessors = DB::select("SELECT d.id, d.nombre, d.email
                                    FROM users d, respuestas r, docente_tests dt
@@ -69,13 +70,13 @@ class RespuestaController extends Controller
             ORDER BY id"
         );
 
-        foreach($respuestas as $respuesta) {
+        foreach ($respuestas as $respuesta) {
             //CONSEGUIR PUNTUACION TOTAL
             $secciones = DB::select("SELECT id FROM seccions WHERE id_test='$respuesta->id_test'");
             $total = 0;
-            foreach($secciones as $seccion) {                
+            foreach ($secciones as $seccion) {
                 $preguntas = DB::select("SELECT id FROM preguntas WHERE id_seccion='$seccion->id'");
-                foreach($preguntas as $pregunta) {
+                foreach ($preguntas as $pregunta) {
                     $max = DB::select("SELECT MAX(asignado) FROM puntuacions WHERE id_pregunta='$pregunta->id'");
                     $total = $total + $max[0]->max;
                 }
@@ -85,7 +86,7 @@ class RespuestaController extends Controller
             //CONSEGUIR PUNTUACION DEL TEST
             $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$respuesta->id'");
             $cont = 0;
-            foreach($resultados as $resultado) {
+            foreach ($resultados as $resultado) {
                 $puntuacion = DB::select("SELECT asignado FROM puntuacions WHERE id='$resultado->id_puntuacion'");
                 $cont = $cont + $puntuacion[0]->asignado;
             }
@@ -110,7 +111,7 @@ class RespuestaController extends Controller
         $respuesta->save();
 
         $puntuaciones = $request->puntuaciones;
-        foreach($puntuaciones as $puntuacion) {
+        foreach ($puntuaciones as $puntuacion) {
             $resultado = new Resultado();
             $resultado->id_respuesta = $respuesta->id;
             $resultado->id_puntuacion = $puntuacion;
@@ -131,7 +132,7 @@ class RespuestaController extends Controller
         $respuesta->save();
 
         $puntuaciones = $request->puntuaciones;
-        foreach($puntuaciones as $puntuacion) {
+        foreach ($puntuaciones as $puntuacion) {
             $resultado = new Resultado();
             $resultado->id_respuesta = $respuesta->id;
             $resultado->id_puntuacion = $puntuacion;
@@ -154,7 +155,7 @@ class RespuestaController extends Controller
         $respuesta = Respuesta::find($id);
         $id_respuesta = $respuesta->id;
         $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$id_respuesta'");
-        foreach($resultados as $resultado) {
+        foreach ($resultados as $resultado) {
             $id_puntuacion = $resultado->id_puntuacion;
             $puntuacion = DB::select("SELECT * FROM puntuacions WHERE id='$id_puntuacion'");
             $resultado->puntuacion = $puntuacion;
