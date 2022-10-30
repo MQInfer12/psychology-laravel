@@ -32,6 +32,8 @@ class CitaController extends Controller
                                 AND h.id_docente=d.id 
                                 AND h.disponible=true");
 
+        dd($horarios);
+
         foreach($horarios as $index => $horario) {
             //USUARIOS DE LAS CITAS DE CADA HORARIO
             $citas = DB::select("SELECT u.email
