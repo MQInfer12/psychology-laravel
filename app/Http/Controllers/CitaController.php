@@ -23,6 +23,7 @@ class CitaController extends Controller
 
     public function allAppointmentsAvailables($email) //LLENAR HORARIOS LIBRES PARA LOS BENEFICIARIOS
     {
+        //HORARIOS DE LOS DOCENTES DEL USUARIO
         $horarios = DB::select("SELECT h.id, h.fecha, h.hora_inicio, h.hora_final, h.disponible, d.email, d.nombre
                                 FROM horarios h, users d, respuestas r, docente_tests dt
                                 WHERE r.email_user='$email'
@@ -31,17 +32,25 @@ class CitaController extends Controller
                                 AND h.id_docente=d.id 
                                 AND h.disponible=true");
 
-        foreach($horarios as $horario) {
-            $citas = DB::select("SELECT c.id_horario, u.email
+        foreach($horarios as $index => $horario) {
+            //USUARIOS DE LAS CITAS DE CADA HORARIO
+            $citas = DB::select("SELECT u.email
                                  FROM citas c, users u
                                  WHERE c.id_horario='$horario->id' AND c.id_usuario=u.id");
-            dd($citas);
+
+            //QUITAR HORARIO SI EXISTE EL USUARIO EN UNA CITA DE ESTE
+            foreach($citas as $cita) {
+                if($cita->email == $email) {
+                    dd($index);
+                }
+            }
         }
 
         foreach($horarios as $horario) {
             $horario->fecha = date_create($horario->fecha);
             $horario->fecha = date_format($horario->fecha, "d/m/Y");
         }
+
         return $horarios;
     }
 
