@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::table('citas', function (Blueprint $table) {
             $table->boolean('aceptado')->after('id_usuario');
         });
+        
     }
 
     /**
