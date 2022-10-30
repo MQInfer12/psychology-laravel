@@ -97,6 +97,13 @@ const Chats = ({ handleClick }) => {
     dispatch({ type: "CHANGE_USER", payload: u });
   };
 
+  const handleShowChat = (v) => {
+    handleSelect(v.userInfo);
+    if(window.innerWidth <= 1080) {
+      handleClick();
+    }
+  }
+
   return (
     <Container>
       {chats &&
@@ -105,8 +112,7 @@ const Chats = ({ handleClick }) => {
             className="userChat"
             key={i}
             onClick={() => {
-              handleSelect(v.userInfo);
-              handleClick();
+              handleShowChat(v);
             }}
           >
             <ProfilePic
