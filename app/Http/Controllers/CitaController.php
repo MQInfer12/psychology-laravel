@@ -30,12 +30,12 @@ class CitaController extends Controller
                                 AND dt.id_docente=d.id
                                 AND h.id_docente=d.id 
                                 AND h.disponible=true");
+        dd($horarios);
 
         foreach($horarios as $horario) {
             $citas = DB::select("SELECT c.id_horario, u.email
                                  FROM citas c, users u
                                  WHERE c.id_horario='$horario->id' AND c.id_usuario=u.id");
-            dd($citas);
         }
 
         foreach($horarios as $horario) {
