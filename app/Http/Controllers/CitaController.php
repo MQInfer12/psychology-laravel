@@ -32,7 +32,7 @@ class CitaController extends Controller
                                 AND h.disponible=true");
 
         $newHorarios = [];
-        foreach($horarios as $index => $horario) {
+        foreach($horarios as $horario) {
             //USUARIOS DE LAS CITAS DE CADA HORARIO
             $citas = DB::select("SELECT u.email
                                  FROM citas c, users u

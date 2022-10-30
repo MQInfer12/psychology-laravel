@@ -16,17 +16,38 @@ class HorarioController extends Controller
         ");
     }
 
-    public function showById($id)
+    public function showById($id) //MOSTRAR HORARIOS A LOS DOCENTES
     {
         $horarios = DB::select("SELECT h.id, h.fecha, h.hora_inicio, h.hora_final, h.disponible, u.email, u.nombre 
-                           from horarios h, users u 
-                           where h.id_docente=u.id and u.id=$id");
+                                from horarios h, users u 
+                                where h.id_docente=u.id and u.id=$id");
+
+        $newHorarios = [];
         foreach($horarios as $horario) {
-            $horario->fecha = date_create($horario->fecha);
-            $horario->fecha = date_format($horario->fecha, "d/m/Y");
+            //USUARIOS DE LAS CITAS DE CADA HORARIO
+            $citas = DB::select("SELECT u.id
+                                 FROM citas c, users u
+                                 WHERE c.id_horario='$horario->id' AND c.id_usuario=u.id");
+
+            $flag = true;
+            //QUITAR HORARIO SI EXISTE EL USUARIO EN UNA CITA DE ESTE
+            foreach($citas as $cita) {
+                if($cita->id == $id) {
+                    $flag = false;
+                }
+            }
+
+            if($flag) {
+                //FORMATEAR FECHA
+                $horario->fecha = date_create($horario->fecha);
+                $horario->fecha = date_format($horario->fecha, "d/m/Y");
+    
+                //PUSHEAR AL NUEVO ARRAY DE HORARIOS
+                $newHorarios[] = $horario;
+            }
         }
 
-        return $horarios;
+        return $newHorarios;
     }
 
     public function showWhoHaveDateTheProfessor($id) //MOSTRAR CITAS A LOS DOCENTES
