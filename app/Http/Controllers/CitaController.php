@@ -38,19 +38,22 @@ class CitaController extends Controller
                                  FROM citas c, users u
                                  WHERE c.id_horario='$horario->id' AND c.id_usuario=u.id");
 
+            $flag = true;
             //QUITAR HORARIO SI EXISTE EL USUARIO EN UNA CITA DE ESTE
             foreach($citas as $cita) {
                 if($cita->email == $email) {
-                    unset($horarios[$index]);
+                    $flag = false;
                 }
             }
 
-            //FORMATEAR FECHA
-            $horario->fecha = date_create($horario->fecha);
-            $horario->fecha = date_format($horario->fecha, "d/m/Y");
-
-            //PUSHEAR AL NUEVO ARRAY DE HORARIOS
-            $newHorarios[] = $horario;
+            if($flag) {
+                //FORMATEAR FECHA
+                $horario->fecha = date_create($horario->fecha);
+                $horario->fecha = date_format($horario->fecha, "d/m/Y");
+    
+                //PUSHEAR AL NUEVO ARRAY DE HORARIOS
+                $newHorarios[] = $horario;
+            }
         }
 
         return $newHorarios;
