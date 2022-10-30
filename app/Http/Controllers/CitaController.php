@@ -41,12 +41,11 @@ class CitaController extends Controller
             //QUITAR HORARIO SI EXISTE EL USUARIO EN UNA CITA DE ESTE
             foreach($citas as $cita) {
                 if($cita->email == $email) {
-                    dd($index);
+                    unset($horarios[$index]);
                 }
             }
-        }
 
-        foreach($horarios as $horario) {
+            //FORMATEAR FECHA
             $horario->fecha = date_create($horario->fecha);
             $horario->fecha = date_format($horario->fecha, "d/m/Y");
         }
