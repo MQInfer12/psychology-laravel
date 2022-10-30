@@ -23,7 +23,7 @@ class CitaController extends Controller
 
     public function allAppointmentsAvailables($email) //LLENAR HORARIOS LIBRES PARA LOS BENEFICIARIOS
     {
-        $horarios = DB::select("SELECT h.id, h.fecha, h.hora_inicio, h.hora_final, h.disponible, d.email, d.nombre
+        $horarios = DB::select("SELECT DISTINCT on (h.id) h.id, h.fecha, h.hora_inicio, h.hora_final, h.disponible, d.email, d.nombre
                                 FROM horarios h, users d, respuestas r, docente_tests dt
                                 WHERE r.email_user='$email'
                                 AND r.id_docente_test=dt.id
