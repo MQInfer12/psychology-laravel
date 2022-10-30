@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('citas', function (Blueprint $table) {
-            $table->boolean('aceptado')->after('id_usuario');
+            $table->boolean('aceptado')->after('id_usuario')->nullable();
         });
     }
 
