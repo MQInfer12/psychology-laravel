@@ -10,6 +10,7 @@ class Cita extends Model
     use HasFactory;
     protected $fillable = [
         'id_horario',
-        'id_usuario'
+        'id_usuario',
+        'aceptado'
     ];
 }

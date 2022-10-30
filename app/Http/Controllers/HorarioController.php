@@ -29,9 +29,9 @@ class HorarioController extends Controller
         return $horarios;
     }
 
-    public function showWhoHaveDateTheProfessor($id)
+    public function showWhoHaveDateTheProfessor($id) //MOSTRAR CITAS A LOS DOCENTES
     {
-        $appointments = DB::select("SELECT c.id, c.id_usuario, h.fecha , h.id as id_horario, h.hora_inicio, h.hora_final, h.disponible, 
+        $appointments = DB::select("SELECT c.id, c.aceptado, c.id_usuario, h.fecha , h.id as id_horario, h.hora_inicio, h.hora_final, h.disponible, 
                                     h.id_docente, u.email, u.nombre
                                     from citas c, horarios h, users u where h.id_docente=$id and c.id_horario=h.id and c.id_usuario = u.id");
         foreach($appointments as $appointment) {

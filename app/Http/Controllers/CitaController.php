@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class CitaController extends Controller
 {
-    public function getAppointmentsSchedule($id)
+    public function getAppointmentsSchedule($id) //VER CITAS POR USUARIO
     {
-        $appointments = DB::select("SELECT c.id, h.fecha, h.hora_inicio, h.hora_final, u.email, u.nombre, c.id_horario 
+        $appointments = DB::select("SELECT c.id, c.aceptado, h.fecha, h.hora_inicio, h.hora_final, u.email, u.nombre, c.id_horario 
                                     from citas c, horarios h, users u 
                                     where c.id_horario = h.id and h.id_docente=u.id and c.id_usuario=$id");
         foreach($appointments as $appointment) {
@@ -37,7 +37,7 @@ class CitaController extends Controller
         return $appointments;
     }
 
-    public function scheduleAppointment(Request $request, $id)
+    public function scheduleAppointment(Request $request, $id) //ASIGNAR UNA CITA PENDIENTE A UN HORARIO
     {
         $request->validate([
             'idUsuario' => 'required',
@@ -50,6 +50,7 @@ class CitaController extends Controller
         $cita = new Cita();
         $cita->id_horario = $id;
         $cita->id_usuario = $request->idUsuario;
+        $cita->aceptado = false;
         $cita->save();
 
         return response()->json(["mensaje" => "se asigno las cita correctamente"], 201);
@@ -76,11 +77,11 @@ class CitaController extends Controller
             'id_usuario' => 'required',
         ]);
 
-        $grupoestudiante = Cita::findOrFail($id);
-        $grupoestudiante->id_horario = $request->id_horario;
-        $grupoestudiante->id_usuario = $request->id_usuario;
+        $cita = Cita::findOrFail($id);
+        $cita->id_horario = $request->id_horario;
+        $cita->id_usuario = $request->id_usuario;
 
-        $grupoestudiante->save();
+        $cita->save();
 
         return response()->json(["mensaje" => "se modifico correctamente"], 201);
     }
