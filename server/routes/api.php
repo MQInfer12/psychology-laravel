@@ -78,7 +78,7 @@ Route::group(['middleware' => 'api'], function(){
 
     //RESPUESTA ROUTES
     Route::apiResource("respuesta", RespuestaController::class);
-    Route::get("respuesta/pdf/{id}", [RespuestaController::class, 'indexPdf']);
+    //Route::get("respuesta/pdf/{id}", [RespuestaController::class, 'indexPdf']);
     Route::get("respuesta/my/{email}", [RespuestaController::class, 'myProffessors']);
     Route::get("respuesta/test/{id}", [RespuestaController::class, 'getIdTest']);
     Route::get("respuesta/docente/{id}", [RespuestaController::class, 'getRespuestasByDocente']);

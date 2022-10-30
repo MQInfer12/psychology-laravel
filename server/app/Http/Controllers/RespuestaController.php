@@ -6,7 +6,7 @@ use App\Models\Respuesta;
 use App\Models\Resultado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
+//use Barryvdh\DomPDF\Facade\Pdf;
 
 class RespuestaController extends Controller
 {
@@ -50,7 +50,7 @@ class RespuestaController extends Controller
     }
 
 
-    public function indexPdf()
+    /*public function indexPdf()
     {
         $respuestas = DB::select(
             "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
@@ -90,7 +90,7 @@ class RespuestaController extends Controller
         //PDF
         $pdf = PDF::loadView('indexPdf', ['respuestas' => $respuestas]);
         return $pdf->stream();
-    }
+    }*/
 
     public function myProffessors($email)
     {
