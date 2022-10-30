@@ -92,6 +92,8 @@ Route::group(['middleware' => 'api'], function(){
     /*Route::apiResource("cita", CitaController::class); */
     Route::put('cita/schedule/{id_schedule}', [CitaController::class, 'scheduleAppointment']);
     Route::get('cita/schedule/{id_user}', [CitaController::class, 'getAppointmentsSchedule']);
+    Route::get('cita/horario/{idHorario}', [CitaController::class, 'getAppointmentsByHorario']);
+    Route::put('cita/accept/{idHorario}/{idCita}', [CitaController::class, 'scheduleAccept']);
     Route::get('cita/allschedule/{email}', [CitaController::class, 'allAppointmentsAvailables']);
     Route::put('cita/allschedule/{idHorario}/{idCita}', [CitaController::class, 'cancelAppointment']);
 });

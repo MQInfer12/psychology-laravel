@@ -21,6 +21,16 @@ class CitaController extends Controller
         return $appointments;
     }
 
+    public function getAppointmentsByHorario($idHorario)
+    {
+        $citas = DB::select("SELECT ci.id, u.nombre
+                             FROM citas ci, users u
+                             WHERE ci.id_usuario=u.id
+                             AND ci.id_horario='$idHorario'
+                             ORDER BY id");
+        return $citas;
+    }
+
     public function allAppointmentsAvailables($email) //LLENAR HORARIOS LIBRES PARA LOS BENEFICIARIOS
     {
         $horarios = DB::select("SELECT DISTINCT on (h.id) h.id, h.fecha, h.hora_inicio, h.hora_final, h.disponible, d.email, d.nombre
@@ -76,6 +86,22 @@ class CitaController extends Controller
         $cita->save();
 
         return response()->json(["mensaje" => "se asigno las cita correctamente"], 201);
+    }
+
+    public function scheduleAccept($idHorario, $idCita) //ACEPTAR UNA CITA
+    {
+        $citas = DB::select("SELECT id
+                            FROM citas
+                            AND ci.id_horario='$idHorario'");
+        foreach($citas as $ct) {
+            Cita::destroy($ct->id);
+        }
+
+        $cita = Cita::findOrFail($idCita);
+        $cita->aceptado = true;
+        $cita->save();
+        
+        return response()->json(["mensaje" => "se modifico correctamente"], 201);
     }
 
     public function cancelAppointment($idHorario, $idCita)
