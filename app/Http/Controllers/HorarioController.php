@@ -29,15 +29,7 @@ class HorarioController extends Controller
                                  FROM citas c, users u
                                  WHERE c.id_horario='$horario->id' AND c.id_usuario=u.id");
 
-            $flag = true;
-            //QUITAR HORARIO SI EXISTE EL USUARIO EN UNA CITA DE ESTE
-            foreach($citas as $cita) {
-                if($cita->id == $id) {
-                    $flag = false;
-                }
-            }
-
-            if($flag) {
+            if(count($citas) == 0) {
                 //FORMATEAR FECHA
                 $horario->fecha = date_create($horario->fecha);
                 $horario->fecha = date_format($horario->fecha, "d/m/Y");
