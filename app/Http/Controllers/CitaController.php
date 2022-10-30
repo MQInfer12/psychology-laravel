@@ -31,8 +31,7 @@ class CitaController extends Controller
                                 AND h.id_docente=d.id 
                                 AND h.disponible=true");
 
-        dd($horarios);
-
+        $newHorarios = [];
         foreach($horarios as $index => $horario) {
             //USUARIOS DE LAS CITAS DE CADA HORARIO
             $citas = DB::select("SELECT u.email
@@ -49,9 +48,12 @@ class CitaController extends Controller
             //FORMATEAR FECHA
             $horario->fecha = date_create($horario->fecha);
             $horario->fecha = date_format($horario->fecha, "d/m/Y");
+
+            //PUSHEAR AL NUEVO ARRAY DE HORARIOS
+            $newHorarios[] = $horario;
         }
 
-        return $horarios;
+        return $newHorarios;
     }
 
     public function scheduleAppointment(Request $request, $id) //ASIGNAR UNA CITA PENDIENTE A UN HORARIO
