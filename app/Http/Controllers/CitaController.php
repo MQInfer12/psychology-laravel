@@ -43,9 +43,9 @@ class CitaController extends Controller
             'idUsuario' => 'required',
         ]);
 
-        $horario = Horario::findOrFail($id);
+        /* $horario = Horario::findOrFail($id);
         $horario->disponible = false;
-        $horario->save();
+        $horario->save(); */
 
         $cita = new Cita();
         $cita->id_horario = $id;
