@@ -150,8 +150,8 @@ class RespuestaController extends Controller
         $existe = DB::select(
             "SELECT id FROM respuestas WHERE email_user='$request->email_user' AND id_docente_test='$request->id_docente_test'"
         );
-        dd($existe[0]);
-        if($existe[0]) {
+        dd($existe);
+        if($existe) {
             return response()->json(["mensaje" => "ya existe la respuesta", "id" => $existe[0]->id], 201);
         }
 
