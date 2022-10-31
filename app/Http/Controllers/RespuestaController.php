@@ -197,19 +197,25 @@ class RespuestaController extends Controller
     public function show($id)
     {
         //$respuesta = Respuesta::find($id);
-        $respuesta = DB::select("SELECT email_user, estado, id, id_docente_test FROM respuestas WHERE id='$id'");
+        $respuesta = DB::select(
+            "SELECT r.email_user, r.estado, r.id, r.id_docente_test, 
+            u.nombre, u.edad, u.genero,
+            t.nombre
+            FROM respuestas r, users u, docente_tests dt, tests t
+            WHERE r.id='$id' 
+            AND r.email_user=u.email AND r.id_docente_test=dt.id AND dt.id_test=t.id"
+        );
 
-        $return = array();
-        array_walk_recursive($respuesta, function($a) use (&$return) { $return[] = $a; });
-        dd($return);
-        /*$id_respuesta = $respuesta->id;
+        $respuesta = $respuesta[0];
+
+        $id_respuesta = $respuesta->id;
         $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$id_respuesta'");
         foreach ($resultados as $resultado) {
             $id_puntuacion = $resultado->id_puntuacion;
             $puntuacion = DB::select("SELECT * FROM puntuacions WHERE id='$id_puntuacion'");
             $resultado->puntuacion = $puntuacion;
         }
-        $respuesta->resultados = $resultados;*/
+        $respuesta->resultados = $resultados;
 
         return $respuesta;
     }
