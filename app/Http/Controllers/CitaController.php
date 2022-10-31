@@ -92,7 +92,7 @@ class CitaController extends Controller
     {
         $citas = DB::select("SELECT id
                             FROM citas
-                            WHERE ci.id_horario='$idHorario'");
+                            WHERE id_horario='$idHorario'");
         foreach($citas as $ct) {
             Cita::destroy($ct->id);
         }
