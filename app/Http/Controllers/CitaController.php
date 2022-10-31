@@ -90,16 +90,21 @@ class CitaController extends Controller
 
     public function scheduleAccept($idHorario, $idCita) //ACEPTAR UNA CITA
     {
+        $cita = Cita::findOrFail($idCita);
+        $cita->aceptado = true;
+        $cita->save();
+
         $citas = DB::select("SELECT id
                             FROM citas
-                            WHERE id_horario='$idHorario'");
+                            WHERE id_horario='$idHorario'
+                            AND aceptado=false");
         foreach($citas as $ct) {
             Cita::destroy($ct->id);
         }
 
-        $cita = Cita::findOrFail($idCita);
-        $cita->aceptado = true;
-        $cita->save();
+        $horario = Horario::findOrFail($idHorario);
+        $horario->disponible = false;
+        $horario->save();
         
         return response()->json(["mensaje" => "se modifico correctamente"], 201);
     }
