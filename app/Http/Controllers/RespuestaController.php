@@ -144,31 +144,6 @@ class RespuestaController extends Controller
     {
         $request->validate([
             'email_user' => 'required',
-            'id_docente_test' => 'required',
-            'puntuaciones' => 'required'
-        ]);
-
-        $respuesta = new Respuesta();
-        $respuesta->email_user = $request->email_user;
-        $respuesta->id_docente_test = $request->id_docente_test;
-        $respuesta->estado = 1;
-        $respuesta->save();
-
-        $puntuaciones = $request->puntuaciones;
-        foreach ($puntuaciones as $puntuacion) {
-            $resultado = new Resultado();
-            $resultado->id_respuesta = $respuesta->id;
-            $resultado->id_puntuacion = $puntuacion;
-            $resultado->save();
-        }
-
-        return response()->json(["mensaje" => "se guardo correctamente"], 201);
-    }
-
-    public function assignAndReturnId(Request $request)
-    {
-        $request->validate([
-            'email_user' => 'required',
             'id_docente_test' => 'required'
         ]);
 
