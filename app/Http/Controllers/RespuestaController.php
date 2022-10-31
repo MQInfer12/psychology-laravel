@@ -199,7 +199,9 @@ class RespuestaController extends Controller
         //$respuesta = Respuesta::find($id);
         $respuesta = DB::select("SELECT email_user, estado, id, id_docente_test FROM respuestas WHERE id='$id'");
 
-        dd(array_walk_recursive($respuesta, function($a) use (&$return) { $return[] = $a; }));
+        $return = array();
+        array_walk_recursive($respuesta, function($a) use (&$return) { $return[] = $a; });
+        dd($return);
         /*$id_respuesta = $respuesta->id;
         $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$id_respuesta'");
         foreach ($resultados as $resultado) {
