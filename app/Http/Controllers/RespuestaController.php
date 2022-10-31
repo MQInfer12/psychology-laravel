@@ -165,6 +165,22 @@ class RespuestaController extends Controller
         return response()->json(["mensaje" => "se guardo correctamente"], 201);
     }
 
+    public function assignAndReturnId(Request $request)
+    {
+        $request->validate([
+            'email_user' => 'required',
+            'id_docente_test' => 'required'
+        ]);
+
+        $respuesta = new Respuesta();
+        $respuesta->email_user = $request->email_user;
+        $respuesta->id_docente_test = $request->id_docente_test;
+        $respuesta->estado = 0;
+        $respuesta->save();
+
+        return response()->json(["mensaje" => "se guardo correctamente", "id" => $respuesta->id], 201);
+    }
+
     public function update(Request $request, $id)
     {
         $request->validate([
