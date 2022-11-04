@@ -19,7 +19,7 @@ class BeneficiarioDocenteController extends Controller
             $usuarios = DB::select("SELECT u.id, u.nombre, u.perfil
                                     FROM users as u, respuestas as r, docente_tests as dt
                                     WHERE r.email_user = u.email AND r.id_docente_test=dt.id AND dt.id='$id_dt'
-                                    LIMIT 5");
+                                    LIMIT 10");
             foreach($usuarios as $usuario) {
                 if($usuario->perfil != null) {
                     $usuario->perfil = "pendiente...";

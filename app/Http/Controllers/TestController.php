@@ -18,7 +18,8 @@ class TestController extends Controller
             $id_test = $test->id;
             $usuarios = DB::select("SELECT u.id, u.nombre, u.perfil
                                     FROM users as u, docente_tests as dt
-                                    WHERE dt.id_test = '$id_test' AND dt.id_docente = u.id");
+                                    WHERE dt.id_test = '$id_test' AND dt.id_docente = u.id
+                                    LIMIT 10");
             foreach($usuarios as $usuario) {
                 if($usuario->perfil != null) {
                     $usuario->perfil = "pendiente...";
