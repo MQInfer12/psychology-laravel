@@ -187,7 +187,11 @@ class RespuestaController extends Controller
     public function getIdTest($id)
     {
         $respuesta = Respuesta::find($id);
-        $id_test = DB::select("SELECT id_test FROM docente_tests WHERE id='$respuesta->id_docente_test'");
+        $id_test = DB::select(
+            "SELECT dt.id_test, d.email_docente
+            FROM docente_tests dt, users d
+            WHERE id='$respuesta->id_docente_test' AND d.id=dt.id_docente"
+        );
         $respuesta->id_test = $id_test[0]->id_test;
         return $respuesta;
     }
