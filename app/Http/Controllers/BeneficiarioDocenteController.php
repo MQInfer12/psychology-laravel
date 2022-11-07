@@ -113,9 +113,9 @@ class BeneficiarioDocenteController extends Controller
         $newObj = [];
         foreach ($objeto as $index => $valor) {
             DB::delete("DELETE from respuestas where email_user='$valor' AND id_docente_test='$request->id_docente_test'");
-            $exists = DB::select("SELECT b.id FROM respuestas r, users b WHERE r.email_user='$valor' AND r.id_docente_test='$request->id_docente_test' AND b.email='$valor'");
+            $exists = DB::select("SELECT id FROM respuestas WHERE email_user='$valor' AND id_docente_test='$request->id_docente_test'");
             $newObj[$index] = (object)[];
-            $newObj[$index]->id = $exists[0]->id;
+            $newObj[$index]->from = $valor;
             $newObj[$index]->exists = count($exists);
         }
         return response()->json(["msg" => "se ha eliminado", "result" => $newObj], 200);
