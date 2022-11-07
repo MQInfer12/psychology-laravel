@@ -118,7 +118,6 @@ class BeneficiarioDocenteController extends Controller
             $newObj[$index]->from = $valor;
             $newObj[$index]->exists = count($exists);
         }
-        dd($newObj);
         return response()->json(["msg" => "se ha eliminado", "exists" => $objeto], 200);
     }
     
