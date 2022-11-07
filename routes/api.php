@@ -45,6 +45,7 @@ Route::group(['middleware' => 'api'], function(){
     Route::get("test/full/{id}", [TestController::class, 'getFullTest']);
     Route::post("test/assignateProfessor", [DocenteTestController::class, 'store']);
     Route::get("test/professor/{id}", [DocenteTestController::class, 'index']);
+    Route::get("test/ids/{id}", [DocenteTestController::class, 'show']);
     Route::get("test/professorNotAssigning/{id}", [DocenteTestController::class, 'getProfessorNotAssigning']);
     Route::get("test/professorAssigning/{id}", [DocenteTestController::class, 'getProfessorAssigning']);
     Route::post("test/deleteprofessorAssigning", [DocenteTestController::class, 'deleteProfessorAssigning']);
@@ -55,6 +56,9 @@ Route::group(['middleware' => 'api'], function(){
     Route::post("test/deleteBenefAssigning", [BeneficiarioDocenteController::class, 'deleteBenefAssigning']);
     Route::get("test/testToBenef/{id}", [BeneficiarioDocenteController::class, 'showTestToBenef']);
     
+    //DOCENTETESTS ROUTES
+
+
     //CARACTERISTICAS ROUTES
     Route::apiResource("caracteristica", CaracteristicaController::class);
     Route::get("caracteristica/test/{id}", [CaracteristicaController::class, 'CaracteristicasByTest']);
