@@ -188,7 +188,7 @@ class RespuestaController extends Controller
     {
         $respuesta = Respuesta::find($id);
         $id_test = DB::select(
-            "SELECT dt.id_test, d.email_docente
+            "SELECT dt.id_test, d.email
             FROM docente_tests dt, users d
             WHERE id='$respuesta->id_docente_test' AND d.id=dt.id_docente"
         );
