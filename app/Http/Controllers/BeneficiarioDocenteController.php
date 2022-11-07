@@ -113,8 +113,11 @@ class BeneficiarioDocenteController extends Controller
 
         foreach ($objeto as $valor) {
             DB::delete("DELETE from respuestas where email_user='$valor' AND id_docente_test='$request->id_docente_test'");
+            $exists = DB::select("SELECT id FROM respuestas WHERE email_user='$valor'");
+            $valor->exists = count($exists);
         }
-        return response()->json(["msg" => "se ha eliminado"], 200);
+        dd($valor);
+        return response()->json(["msg" => "se ha eliminado", "exists" => $objeto], 200);
     }
     
     public function showTestToBenef($id)
