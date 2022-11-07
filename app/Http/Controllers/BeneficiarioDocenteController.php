@@ -110,11 +110,11 @@ class BeneficiarioDocenteController extends Controller
         ]);
         $objeto = $request->objeto;
 
+        dd($objeto);
         $newObj = (object) [
             "objeto" => "a",
             "hola" => "b"
         ];
-        dd($newObj);
         foreach ($objeto as $valor) {
             DB::delete("DELETE from respuestas where email_user='$valor' AND id_docente_test='$request->id_docente_test'");
             $exists = DB::select("SELECT id FROM respuestas WHERE email_user='$valor'");
