@@ -192,8 +192,7 @@ class RespuestaController extends Controller
             WHERE r.id='$id' AND r.id_docente_test=dt.id AND dt.id_test=t.id"
         );
         $idt = $respuesta[0]->id;
-
-        $return = 
+        
         $test = DB::select("SELECT * FROM tests WHERE id='$idt'");
         $test = $test[0];
 
