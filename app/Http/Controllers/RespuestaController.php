@@ -187,6 +187,7 @@ class RespuestaController extends Controller
     public function getFullRespuesta($id)
     {
         $respuesta = Respuesta::findOrFail($id);
+        dd($respuesta);
         $idt = $respuesta->id_test;
 
         $test = DB::select("SELECT * FROM tests WHERE id='$idt'");
