@@ -193,6 +193,7 @@ class RespuestaController extends Controller
         );
         $idt = $respuesta[0]->id;
 
+        $return = 
         $test = DB::select("SELECT * FROM tests WHERE id='$idt'");
         $test = $test[0];
 
