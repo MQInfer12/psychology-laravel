@@ -187,7 +187,7 @@ class RespuestaController extends Controller
     public function getFullRespuesta($id)
     {
         $respuesta = DB::select(
-            "SELECT id 
+            "SELECT t.id 
             FROM respuestas r, docente_tests dt, tests t
             WHERE r.id='$id' AND r.id_docente_test=dt.id AND dt.id_test=t.id"
         );
