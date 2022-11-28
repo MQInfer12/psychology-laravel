@@ -54,7 +54,7 @@ class TestController extends Controller
         $showTest = DB::select("SELECT *
                                 FROM tests
                                 WHERE id='$id'");
-        return response()->json($showTest);
+        return response()->json($showTest[0]);
     }
 
     public function update(Request $request, $id)
