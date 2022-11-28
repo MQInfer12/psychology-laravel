@@ -16,12 +16,6 @@ class DocenteTestController extends Controller
             from docente_tests dt, users u, tests te
             where dt.id_docente=u.id and dt.id_test=te.id and dt.id_test=$id
         ");
-
-        foreach ($showTests as $user) {
-            if ($user->perfil != null) {
-                $user->perfil = "pendiente...";
-            }
-        }
         return response()->json($showTests);
     }
 
@@ -47,23 +41,11 @@ class DocenteTestController extends Controller
             $getProfessorsNotAssigning = DB::select("SELECT u.id, u.nombre as nombre_user, u.email, 
             u.estado, s.nombre as nombre_sede, u.perfil from users u, sedes s 
             where u.id_rol=2 and u.id_sede=s.id");
-
-            foreach($getProfessorsNotAssigning as $profesor) {
-                if($profesor->perfil != null) {
-                    $profesor->perfil = "pendiente...";
-                }
-            }
         } else {
             $getProfessorsNotAssigning = DB::select("SELECT u.id, u.nombre as nombre_user, u.email,
              u.estado, s.nombre as nombre_sede, u.perfil
              from users u, sedes s 
             where u.id_rol=2 and u.id_sede=s.id " . $condition);
-
-            foreach($getProfessorsNotAssigning as $profesor) {
-                if($profesor->perfil != null) {
-                    $profesor->perfil = "pendiente...";
-                }
-            }
         }
 
         return response()->json($getProfessorsNotAssigning);
@@ -76,11 +58,6 @@ class DocenteTestController extends Controller
         foreach ($getIdDocente as $idProfessor) {
             $aux = DB::select("SELECT u.id, u.nombre as nombre_user, u.email, u.estado, u.perfil, s.nombre as nombre_sede from users u, sedes s 
             where u.id_rol=2 and u.id_sede=s.id and u.id=$idProfessor->id_docente");
-            foreach($aux as $profesor) {
-                if($profesor->perfil != null) {
-                    $profesor->perfil = "pendiente...";
-                }
-            }
             $vec = array_merge_recursive($vec, $aux);
         }
         return response()->json($vec);

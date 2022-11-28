@@ -52,11 +52,6 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $usuario = auth()->user();
-        if ($usuario->perfil != null) {
-            $usuario->perfil = "pendiente...";
-        }
-
         return response()->json(auth()->user());
     }
 

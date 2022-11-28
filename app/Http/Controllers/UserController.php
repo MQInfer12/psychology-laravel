@@ -17,12 +17,6 @@ class UserController extends Controller
                                 where u.id_rol=r.id 
                                 and u.id_sede=s.id
                                 order by u.id;");
-        foreach($showUser as $user) {
-            if($user->perfil != null) {
-                $user->perfil = "pendiente...";
-            }
-        }
-
         return response()->json($showUser);
     }
 
@@ -34,19 +28,13 @@ class UserController extends Controller
         from users u, rols r, sedes s 
         where u.id_sede=s.id and u.id_rol=r.id and r.nombre='docente'");
 
-        foreach ($showUser as $user) {
-            if ($user->perfil != null) {
-                $user->perfil = stream_get_contents($user->perfil);
-            }
-        }
-
         return response()->json($showUser);
     }
 
     public function getPic($id)
     {
         $usuario = DB::select("SELECT perfil from users where id='$id'");
-        $foto = stream_get_contents($usuario[0]->perfil);
+        $foto = $usuario[0]->perfil;
         return response()->json(["perfil" => $foto], 201);
     }
 
@@ -101,10 +89,6 @@ class UserController extends Controller
         $user->edad = $request->edad;
         $user->id_sede = $request->id_sede;
         $user->save();
-
-        if($user->perfil != null) {
-            $user->perfil = "pendiente...";
-        }
 
         return response()->json(["mensaje" => "se actualizo correctamente", "user" => $user], 209);
     }

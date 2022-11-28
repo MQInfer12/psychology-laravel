@@ -20,11 +20,6 @@ class BeneficiarioDocenteController extends Controller
                                     FROM users as u, respuestas as r, docente_tests as dt
                                     WHERE r.email_user = u.email AND r.id_docente_test=dt.id AND dt.id='$id_dt'
                                     LIMIT 10");
-            foreach($usuarios as $usuario) {
-                if($usuario->perfil != null) {
-                    $usuario->perfil = "pendiente...";
-                }
-            }
             $test->usuarios = $usuarios;
         }  
 
@@ -37,12 +32,6 @@ class BeneficiarioDocenteController extends Controller
                                     u.id as id_user, u.nombre as nombre_user, s.nombre as sede, u.perfil
                                     from respuestas as bdt, users u, sedes as s
                                     where bdt.email_user=u.email and s.id=u.id_sede and bdt.id_docente_test=$id");
-
-        foreach($getIdDocente as $benef) {
-            if($benef->perfil != null) {
-                $benef->perfil = "pendiente...";
-            }
-        }
         return response()->json($getIdDocente);
     }
 
@@ -64,19 +53,9 @@ class BeneficiarioDocenteController extends Controller
         if ($getIdsany) {
             $getBenefNotAssigning = DB::select("SELECT u.id, u.nombre as nombre_usuario, u.email, u.estado, u.perfil
             from users as u where u.id_rol=1");
-            foreach($getBenefNotAssigning as $benef) {
-                if($benef->perfil != null) {
-                    $benef->perfil = "pendiente...";
-                }
-            }
         } else {
             $getBenefNotAssigning = DB::select("SELECT u.id, u.nombre as nombre_usuario, u.email, u.estado, u.perfil
             from users as u where u.id_rol=1 " . $condition);
-            foreach($getBenefNotAssigning as $benef) {
-                if($benef->perfil != null) {
-                    $benef->perfil = "pendiente...";
-                }
-            }
         }
 
         return response()->json($getBenefNotAssigning);
