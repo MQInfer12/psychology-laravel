@@ -37,4 +37,14 @@ class SeccionController extends Controller
                            FROM seccions
                            WHERE id_test='$idTest'");
     }
-}
+
+    public function changeMultimarcado($id) 
+    {
+        $seccion = Seccion::findOrFail($id);
+        $multimarcado = $seccion->multimarcado;
+        $seccion->multimarcado = !$multimarcado;
+        $seccion->save();
+
+        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+    }
+} 
