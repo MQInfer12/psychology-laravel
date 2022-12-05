@@ -58,7 +58,6 @@ Route::group(['middleware' => 'api'], function(){
     
     //DOCENTETESTS ROUTES
 
-
     //CARACTERISTICAS ROUTES
     Route::apiResource("caracteristica", CaracteristicaController::class);
     Route::get("caracteristica/test/{id}", [CaracteristicaController::class, 'CaracteristicasByTest']);
