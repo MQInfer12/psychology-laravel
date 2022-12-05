@@ -175,6 +175,7 @@ class RespuestaController extends Controller
 
         $puntuaciones = $request->puntuaciones;
         foreach ($puntuaciones as $puntuacion) {
+            dd($puntuacion);
             $resultado = new Resultado();
             $resultado->id_respuesta = $respuesta->id;
             $resultado->id_puntuacion = $puntuacion;
