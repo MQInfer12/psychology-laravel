@@ -175,9 +175,13 @@ class RespuestaController extends Controller
 
         $puntuaciones = $request->puntuaciones;
         foreach ($puntuaciones as $puntuacion) {
-            dd(gettype([]) == "array");
             if(gettype($puntuacion) == "array") {
-
+                foreach($puntuacion as $pt) {
+                    $resultado = new Resultado();
+                    $resultado->id_respuesta = $respuesta->id;
+                    $resultado->id_puntuacion = $pt;
+                    $resultado->save();
+                }
             } else {
                 $resultado = new Resultado();
                 $resultado->id_respuesta = $respuesta->id;
