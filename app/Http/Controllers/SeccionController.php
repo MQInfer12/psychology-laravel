@@ -35,7 +35,8 @@ class SeccionController extends Controller
     {
         return DB::select("SELECT *
                            FROM seccions
-                           WHERE id_test='$idTest'");
+                           WHERE id_test='$idTest'
+                           ORDER BY id");
     }
 
     public function changeMultimarcado($id) 
