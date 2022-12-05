@@ -75,6 +75,7 @@ Route::group(['middleware' => 'api'], function(){
     Route::apiResource("reactivo", ReactivoController::class);
     Route::get("reactivo/seccion/{idSeccion}", [ReactivoController::class, 'reactivosBySeccion']);
     Route::put("seccion/multimarcado/{id}", [SeccionController::class, 'changeMultimarcado']);
+    Route::put("seccion/vacio/{id}", [SeccionController::class, 'changeVacio']);
 
     //PUNTUACIONES ROUTES
     Route::post("puntuacion/reactivo", [PuntuacionController::class, 'puntuacionesByReactivos']);

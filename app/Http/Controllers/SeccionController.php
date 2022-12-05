@@ -48,4 +48,14 @@ class SeccionController extends Controller
 
         return response()->json(["mensaje" => "se guardo correctamente"], 201);
     }
+
+    public function changeVacio($id) 
+    {
+        $seccion = Seccion::findOrFail($id);
+        $vacio = $seccion->vacio;
+        $seccion->vacio = !$vacio;
+        $seccion->save();
+
+        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+    }
 } 

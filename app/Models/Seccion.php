@@ -11,6 +11,7 @@ class Seccion extends Model
 
     protected $fillable = [
         "id_test",
-        "multimarcado"
+        "multimarcado",
+        "vacio"
     ];
 }
