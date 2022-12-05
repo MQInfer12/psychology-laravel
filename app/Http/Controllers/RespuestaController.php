@@ -175,11 +175,15 @@ class RespuestaController extends Controller
 
         $puntuaciones = $request->puntuaciones;
         foreach ($puntuaciones as $puntuacion) {
-            dd(gettype([]));
-            $resultado = new Resultado();
-            $resultado->id_respuesta = $respuesta->id;
-            $resultado->id_puntuacion = $puntuacion;
-            $resultado->save();
+            dd(gettype([]) == "array");
+            if(gettype($puntuacion) == "array") {
+
+            } else {
+                $resultado = new Resultado();
+                $resultado->id_respuesta = $respuesta->id;
+                $resultado->id_puntuacion = $puntuacion;
+                $resultado->save();
+            }
         }
 
         return response()->json(["mensaje" => "se guardo correctamente"], 201);
