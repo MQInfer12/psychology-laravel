@@ -82,6 +82,8 @@ class TestController extends Controller
 
         $id_test = $test->id;
 
+        $caracteristicas = DB::select("SELECT * FROM caracteristicas WHERE id_test='$id_test' ORDER BY id");
+        $test->caracteristicas = $caracteristicas;
         $secciones = DB::select("SELECT id, multimarcado, vacio FROM seccions WHERE id_test='$id_test' ORDER BY id");
         foreach($secciones as $seccion) {
             $id_seccion = $seccion->id;
