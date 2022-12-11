@@ -17,6 +17,17 @@ class ArticuloController extends Controller
     {
         $file = $request->documento;
         $file->storeAs('', 'doc1'.'.'.$file->extension(), 'public');
+
+        $files = [];
+
+        foreach(Storage::disk("public")->files() as $file) {
+            $name = str_replace("public/","",$file);
+            $files[] = [
+                "name" => $name
+            ];
+        }
+
+        return response()->json(["files" => $files]);
     }
 
     public function show($id)
