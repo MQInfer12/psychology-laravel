@@ -14,7 +14,7 @@ class ArticuloController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->documento);
+        dd($request->titulo);
     }
 
     public function show($id)
