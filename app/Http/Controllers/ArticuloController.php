@@ -22,10 +22,10 @@ class ArticuloController extends Controller
 
         foreach(Storage::disk("public")->files() as $file) {
             $name = str_replace("public/","",$file);
-            $download = route("download", $name);
+            //$download = route("download", $name);
             $files[] = [
                 "name" => $name,
-                "download" => $download
+                //"download" => $download
             ];
         }
 
