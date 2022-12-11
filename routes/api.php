@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticuloController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeneficiarioDocenteController;
 use App\Http\Controllers\CaracteristicaController;
@@ -102,4 +103,7 @@ Route::group(['middleware' => 'api'], function(){
     Route::put('cita/accept/{idHorario}/{idCita}', [CitaController::class, 'scheduleAccept']);
     Route::get('cita/allschedule/{email}', [CitaController::class, 'allAppointmentsAvailables']);
     Route::put('cita/allschedule/{idHorario}/{idCita}', [CitaController::class, 'cancelAppointment']);
+
+    //ARTICULOS
+    Route::apiResource("articulo", ArticuloController::class);
 });
