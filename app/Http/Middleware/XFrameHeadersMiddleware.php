@@ -30,7 +30,7 @@ class XFrameHeadersMiddleware
          *
          */
         $response = $next($request);
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        $response->headers->set('X-Frame-Options', 'ALLOW-FROM http://127.0.0.1:5173');
         return $response;
     }
 }
