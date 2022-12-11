@@ -15,8 +15,8 @@ class ArticuloController extends Controller
 
     public function store(Request $request)
     {
-        $file = $request->file('documento');
-        dd($file);
+        $file = $request->documento;
+        $file->storeAs('', 'doc1'.'.'.$file->extension(), 'public');
     }
 
     public function show($id)
