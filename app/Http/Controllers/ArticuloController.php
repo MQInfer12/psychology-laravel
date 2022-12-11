@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Articulo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ArticuloController extends Controller
 {
@@ -14,7 +15,8 @@ class ArticuloController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->documento);
+        $file = $request->documento;
+        $file->storeAs('', 'file1.pdf');
     }
 
     public function show($id)
