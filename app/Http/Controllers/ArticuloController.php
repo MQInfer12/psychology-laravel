@@ -26,7 +26,6 @@ class ArticuloController extends Controller
         $articulo->titulo = $request->titulo;
         $articulo->descripcion = $articulo->descripcion;
         $articulo->documento = $name;
-        dd($articulo);
         $articulo->save();
 
         return response()->json(["message" => "Se guardo correctamente"], 201);
