@@ -106,4 +106,5 @@ Route::group(['middleware' => 'api'], function(){
 
     //ARTICULOS
     Route::apiResource("articulo", ArticuloController::class);
+    Route::get('articulo/docente/{id_docente}', [ArticuloController::class, 'getArticlesByDocente']);
 });
