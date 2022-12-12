@@ -20,13 +20,13 @@ class ArticuloController extends Controller
         $file = $request->documento;
         $name = $request->titulo.'.'.$file->extension();
         $file->storeAs('', $name, 'public');
-        dd($name);
         
         $articulo = new Articulo();
         $articulo->id_docente = $request->id_docente;
         $articulo->titulo = $request->titulo;
         $articulo->descripcion = $articulo->descripcion;
         $articulo->documento = $name;
+        dd($articulo);
         $articulo->save();
 
         return response()->json(["message" => "Se guardo correctamente"], 201);
