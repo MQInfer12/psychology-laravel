@@ -26,15 +26,7 @@ class ArticuloController extends Controller
         $articulo->titulo = $request->titulo;
         $articulo->descripcion = $articulo->descripcion;
         $articulo->documento = $name;
-
-        /* foreach(Storage::disk("public")->files() as $file) {
-            $name = str_replace("public/","",$file);
-            $asset = asset("storage/".$name);
-            $files[] = [
-                "name" => $name,
-                "asset" => $asset
-            ];
-        } */
+        $articulo->save();
 
         return response()->json(["message" => "Se guardo correctamente"], 201);
     }
@@ -46,9 +38,15 @@ class ArticuloController extends Controller
     
     public function getArticlesByDocente($id_docente)
     {
-        /* $articles = DB::select("SELECT * FROM articulos WHERE id_docente='$id_docente' ORDER BY id");
-        return $articles; */
-        $file = "storage/prueba2.pdf";
+        $articles = DB::select("SELECT * FROM articulos WHERE id_docente='$id_docente' ORDER BY id");
+        return $articles;
+    }
+
+    public function getArticlePdf($id)
+    {
+        $article = Articulo::findOrFail($id);
+        $name = $article->documento;
+        $file = "storage/" + $name;
         return response()->file($file);
     }
 
