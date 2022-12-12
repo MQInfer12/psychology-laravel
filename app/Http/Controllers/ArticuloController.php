@@ -24,7 +24,7 @@ class ArticuloController extends Controller
         $articulo = new Articulo();
         $articulo->id_docente = $request->id_docente;
         $articulo->titulo = $request->titulo;
-        $articulo->descripcion = $articulo->descripcion;
+        $articulo->descripcion = $request->descripcion;
         $articulo->documento = $name;
         $articulo->save();
 
