@@ -20,6 +20,7 @@ class ArticuloController extends Controller
         $file = $request->documento;
         $name = $request->titulo.'.'.$file->extension();
         $file->storeAs('', $name, 'public');
+        dd($name);
         
         $articulo = new Articulo();
         $articulo->id_docente = $request->id_docente;
