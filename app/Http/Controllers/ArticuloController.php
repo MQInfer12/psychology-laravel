@@ -47,7 +47,7 @@ class ArticuloController extends Controller
         $article = Articulo::findOrFail($id);
         $name = $article->documento;
         $file = "storage/" + $name;
-        dd($file);
+        dd($file); 
         return response()->file($file);
     }
 
