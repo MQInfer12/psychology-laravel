@@ -43,19 +43,19 @@ Route::group(['middleware' => 'api'], function(){
 
     //TEST ROUTES
     Route::apiResource("test", TestController::class);
-    Route::get("test/full/{id}", [TestController::class, 'getFullTest']);
+    Route::get("test/user/{id}", [TestController::class, 'getTestsForUser']);
+    Route::get("test/edit/{id}", [TestController::class, 'getTestToEdit']);
+    Route::get("test/full/{idUser}/{idRespuestaTest}", [TestController::class, 'getFullTest']);
     Route::post("test/assignateProfessor", [DocenteTestController::class, 'store']);
     Route::get("test/professor/{id}", [DocenteTestController::class, 'index']);
     Route::get("test/ids/{id}", [DocenteTestController::class, 'show']);
     Route::get("test/professorNotAssigning/{id}", [DocenteTestController::class, 'getProfessorNotAssigning']);
     Route::get("test/professorAssigning/{id}", [DocenteTestController::class, 'getProfessorAssigning']);
     Route::post("test/deleteprofessorAssigning", [DocenteTestController::class, 'deleteProfessorAssigning']);
-    Route::get("test/testToprofessor/{id}", [BeneficiarioDocenteController::class, 'showTestToProffessor']);
     Route::get("test/benefAssigning/{id}", [BeneficiarioDocenteController::class, 'getBenefAssigning']);
     Route::get("test/benefNoAssigning/{id}", [BeneficiarioDocenteController::class, 'getBenefNotAssigning']);
     Route::post("test/AssigningVariosBenef", [BeneficiarioDocenteController::class, 'assignBenefToTest']);
     Route::post("test/deleteBenefAssigning", [BeneficiarioDocenteController::class, 'deleteBenefAssigning']);
-    Route::get("test/testToBenef/{id}", [BeneficiarioDocenteController::class, 'showTestToBenef']);
     
     //DOCENTETESTS ROUTES
 
@@ -72,40 +72,38 @@ Route::group(['middleware' => 'api'], function(){
     Route::get("pregunta/seccion/{idSeccion}", [PreguntaController::class, 'preguntasBySeccion']);
     Route::post("pregunta/destroy", [PreguntaController::class, 'massDestroy']);
     
-    //SECCIONES ROUTES
+    //REACTIVOS ROUTES
     Route::apiResource("reactivo", ReactivoController::class);
     Route::get("reactivo/seccion/{idSeccion}", [ReactivoController::class, 'reactivosBySeccion']);
+    Route::put("reactivo/predeterminado/{id}", [ReactivoController::class, 'changePredeterminado']);
+
+    //SECCIONES ROUTES
+    Route::get("seccion/full/{id}", [SeccionController::class, 'getFullSeccion']);
     Route::put("seccion/multimarcado/{id}", [SeccionController::class, 'changeMultimarcado']);
     Route::put("seccion/vacio/{id}", [SeccionController::class, 'changeVacio']);
 
     //PUNTUACIONES ROUTES
     Route::post("puntuacion/reactivo", [PuntuacionController::class, 'puntuacionesByReactivos']);
+    Route::get("puntuacion/seccion/{id}", [PuntuacionController::class, 'puntuacionesBySeccion']);
     Route::put("puntuacion/update", [PuntuacionController::class, 'massUpdate']);
+    Route::put("puntuacion/voltear/{idPregunta}", [PuntuacionController::class, 'voltearPuntuaciones']);
 
     //RESPUESTA ROUTES
     Route::apiResource("respuesta", RespuestaController::class);
-    Route::get("respuesta/full/{id}", [RespuestaController::class, 'getFullRespuesta']);
-    Route::get("respuesta/pdf/{id}", [RespuestaController::class, 'indexPdf']);
-    Route::get("respuesta/my/{email}", [RespuestaController::class, 'myProffessors']);
-    Route::get("respuesta/test/{id}", [RespuestaController::class, 'getIdTest']);
-    Route::get("respuesta/docente/{id}", [RespuestaController::class, 'getRespuestasByDocente']);
+    Route::get("respuesta/user/{id}", [RespuestaController::class, 'getRespuestasByUser']);
 
     //HORARIOS
     Route::apiResource("horario", HorarioController::class);
-    Route::get('horario/show/{id_docente}', [HorarioController::class, 'showById']);
-    Route::get('horario/showWho/{id_docente}', [HorarioController::class, 'showWhoHaveDateTheProfessor']);
 
     //Citas
-    /*Route::apiResource("cita", CitaController::class); */
     Route::put('cita/schedule/{id_schedule}', [CitaController::class, 'scheduleAppointment']);
-    Route::get('cita/schedule/{id_user}', [CitaController::class, 'getAppointmentsSchedule']);
     Route::get('cita/horario/{idHorario}', [CitaController::class, 'getAppointmentsByHorario']);
     Route::put('cita/accept/{idHorario}/{idCita}', [CitaController::class, 'scheduleAccept']);
-    Route::get('cita/allschedule/{email}', [CitaController::class, 'allAppointmentsAvailables']);
-    Route::put('cita/allschedule/{idHorario}/{idCita}', [CitaController::class, 'cancelAppointment']);
+    Route::put('cita/allschedule/{idHorario}/{idCita}', [CitaController::class, 'cancelAppointment']); 
+    Route::get('cita/all/{id}', [CitaController::class, 'getHorariosYCitas']);
 
     //ARTICULOS
     Route::apiResource("articulo", ArticuloController::class);
     Route::get('articulo/docente/{id_docente}', [ArticuloController::class, 'getArticlesByDocente']);
-    Route::get('articulo/documento/{id}', [ArticuloController::class, 'getArticlePdf']);  
+    Route::get('articulo/documento/{id}', [ArticuloController::class, 'getArticlePdf']);
 });

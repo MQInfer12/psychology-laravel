@@ -26,6 +26,16 @@ class PuntuacionController extends Controller
         }
     }
 
+    public function puntuacionesBySeccion($id)
+    {
+        $puntuaciones = DB::select(
+            "SELECT DISTINCT on (pu.id) pu.id, pu.id_pregunta, pu.id_reactivo, pu.asignado 
+            FROM puntuacions as pu, preguntas as pr, reactivos as r
+            WHERE (pu.id_pregunta=pr.id AND pr.id_seccion='$id') OR (pu.id_reactivo=r.id AND r.id_seccion='$id')"
+        );
+        return $puntuaciones;
+    }
+
     public function massUpdate(Request $request)
     {
         $puntuaciones = $request->puntuaciones;
@@ -33,6 +43,19 @@ class PuntuacionController extends Controller
             $new = Puntuacion::findOrFail($puntuacion['id']);
             $new->asignado = $puntuacion['asignado'];
             $new->save();
+        }
+        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+    }
+
+    public function voltearPuntuaciones($idPregunta)
+    {
+        $puntuaciones = DB::select("SELECT * FROM puntuacions WHERE id_pregunta='$idPregunta' ORDER BY id");
+        foreach($puntuaciones as $puntuacion) {
+            $aux[] = $puntuacion->asignado;
+        }
+        foreach($puntuaciones as $i => $puntuacion) {
+            $newValue = $aux[count($puntuaciones) - 1 - $i];
+            DB::update("UPDATE puntuacions SET asignado='$newValue' WHERE id='$puntuacion->id'");
         }
         return response()->json(["mensaje" => "se guardo correctamente"], 201);
     }

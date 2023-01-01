@@ -67,4 +67,16 @@ class ReactivoController extends Controller
     {
         return Reactivo::destroy($id);
     }
+
+    public function changePredeterminado(Request $request, $id)
+    {
+        $request->validate([
+            "predeterminado" => "required",
+        ]);
+
+        DB::update("UPDATE reactivos SET predeterminado='$request->predeterminado' WHERE id='$id'");
+        DB::select("UPDATE puntuacions SET asignado='$request->predeterminado' WHERE id_reactivo='$id'");
+
+        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+    }
 }

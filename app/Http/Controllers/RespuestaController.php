@@ -6,138 +6,87 @@ use App\Models\Respuesta;
 use App\Models\Resultado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class RespuestaController extends Controller
 {
-    public function index()
+    public function getRespuestasByUser($id)
     {
-        $respuestas = DB::select(
-            "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
-                    u.nombre as nombre_user,
-                    d.nombre as nombre_docente, d.email as email_docente,
-                    t.id as id_test, t.nombre as nombre_test, t.descripcion, 
-                    CASE WHEN r.estado=1 THEN 'Recibido' WHEN r.estado=0 THEN 'Pendiente' END
-            FROM respuestas as r, docente_tests as dt, users as d, users as u, tests as t
-            WHERE dt.id=r.id_docente_test AND d.id=dt.id_docente AND u.email=r.email_user AND t.id=dt.id_test
-            ORDER BY id"
-        );
+        $user = DB::select("SELECT id_rol FROM users WHERE id='$id'");
+        $rol = $user[0]->id_rol;
 
-        foreach ($respuestas as $respuesta) {
-            //CONSEGUIR PUNTUACION TOTAL
-            $secciones = DB::select("SELECT id FROM seccions WHERE id_test='$respuesta->id_test'");
-            $total = 0;
-            foreach ($secciones as $seccion) {
-                $preguntas = DB::select("SELECT id FROM preguntas WHERE id_seccion='$seccion->id'");
-                foreach ($preguntas as $pregunta) {
-                    $max = DB::select("SELECT MAX(asignado) FROM puntuacions WHERE id_pregunta='$pregunta->id'");
-                    $total = $total + $max[0]->max;
+        if($rol == 3) {
+            $respuestas = DB::select(
+                "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
+                        u.nombre as nombre_user,
+                        d.nombre as nombre_docente, d.email as email_docente,
+                        t.id as id_test, t.nombre as nombre_test, t.descripcion,
+                        CASE WHEN r.estado=1 THEN 'Recibido' WHEN r.estado=0 THEN 'Pendiente' END
+                FROM respuestas as r, docente_tests as dt, users as d, users as u, tests as t
+                WHERE dt.id=r.id_docente_test AND d.id=dt.id_docente AND u.email=r.email_user AND t.id=dt.id_test
+                ORDER BY id"
+            );
+    
+            foreach ($respuestas as $respuesta) {
+                //CONSEGUIR PUNTUACION TOTAL
+                $secciones = DB::select("SELECT id FROM seccions WHERE id_test='$respuesta->id_test'");
+                $total = 0;
+                foreach ($secciones as $seccion) {
+                    $preguntas = DB::select("SELECT id FROM preguntas WHERE id_seccion='$seccion->id'");
+                    foreach ($preguntas as $pregunta) {
+                        $max = DB::select("SELECT MAX(asignado) FROM puntuacions WHERE id_pregunta='$pregunta->id'");
+                        $total = $total + $max[0]->max;
+                    }
                 }
-            }
-            $respuesta->total = $total;
-
-            //CONSEGUIR PUNTUACION DEL TEST
-            $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$respuesta->id'");
-            $cont = 0;
-            foreach ($resultados as $resultado) {
-                $puntuacion = DB::select("SELECT asignado FROM puntuacions WHERE id='$resultado->id_puntuacion'");
-                $cont = $cont + $puntuacion[0]->asignado;
-            }
-            $respuesta->puntuacion = $cont;
-        }
-
-        return $respuestas;
-    }
-
-    public function indexPdf()
-    {
-        $respuestas = DB::select(
-            "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
-                    u.nombre as nombre_user,
-                    d.nombre as nombre_docente, d.email as email_docente,
-                    t.id as id_test, t.nombre as nombre_test, t.descripcion, 
-                    CASE WHEN r.estado=1 THEN 'Recibido' WHEN r.estado=0 THEN 'Pendiente' END
-            FROM respuestas as r, docente_tests as dt, users as d, users as u, tests as t
-            WHERE dt.id=r.id_docente_test AND d.id=dt.id_docente AND u.email=r.email_user AND t.id=dt.id_test
-            ORDER BY id"
-        );
-
-        foreach ($respuestas as $respuesta) {
-            //CONSEGUIR PUNTUACION TOTAL
-            $secciones = DB::select("SELECT id FROM seccions WHERE id_test='$respuesta->id_test'");
-            $total = 0;
-            foreach ($secciones as $seccion) {
-                $preguntas = DB::select("SELECT id FROM preguntas WHERE id_seccion='$seccion->id'");
-                foreach ($preguntas as $pregunta) {
-                    $max = DB::select("SELECT MAX(asignado) FROM puntuacions WHERE id_pregunta='$pregunta->id'");
-                    $total = $total + $max[0]->max;
+                $respuesta->total = $total;
+    
+                //CONSEGUIR PUNTUACION DEL TEST
+                $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$respuesta->id'");
+                $cont = 0;
+                foreach ($resultados as $resultado) {
+                    $puntuacion = DB::select("SELECT asignado FROM puntuacions WHERE id='$resultado->id_puntuacion'");
+                    $cont = $cont + $puntuacion[0]->asignado;
                 }
+                $respuesta->puntuacion = $cont;
             }
-            $respuesta->total = $total;
-
-            //CONSEGUIR PUNTUACION DEL TEST
-            $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$respuesta->id'");
-            $cont = 0;
-            foreach ($resultados as $resultado) {
-                $puntuacion = DB::select("SELECT asignado FROM puntuacions WHERE id='$resultado->id_puntuacion'");
-                $cont = $cont + $puntuacion[0]->asignado;
-            }
-            $respuesta->puntuacion = $cont;
-        }
-
-       
-        //PDF
-        $pdf = PDF::loadView('indexPdf', ['respuestas' => $respuestas]);
-        return $pdf->stream();
-    }
-
-    public function myProffessors($email)
-    {
-        $proffessors = DB::select("SELECT d.id, d.nombre, d.email
-                                   FROM users d, respuestas r, docente_tests dt
-                                   WHERE r.email_user='$email'
-                                   AND r.id_docente_test=dt.id
-                                   AND dt.id_docente=d.id");
-        return $proffessors;
-    }
-
-    public function getRespuestasByDocente($id)
-    {
-        $respuestas = DB::select(
-            "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
-                    u.nombre as nombre_user,
-                    d.nombre as nombre_docente, d.email as email_docente,
-                    t.id as id_test, t.nombre as nombre_test, t.descripcion,
-                    CASE WHEN r.estado=1 THEN 'Recibido' WHEN r.estado=0 THEN 'Pendiente' END
-            FROM respuestas as r, docente_tests as dt, users as d, users as u, tests as t
-            WHERE dt.id=r.id_docente_test AND d.id=dt.id_docente AND u.email=r.email_user AND t.id=dt.id_test AND dt.id_docente='$id'
-            ORDER BY id"
-        );
-
-        foreach ($respuestas as $respuesta) {
-            //CONSEGUIR PUNTUACION TOTAL
-            $secciones = DB::select("SELECT id FROM seccions WHERE id_test='$respuesta->id_test'");
-            $total = 0;
-            foreach ($secciones as $seccion) {
-                $preguntas = DB::select("SELECT id FROM preguntas WHERE id_seccion='$seccion->id'");
-                foreach ($preguntas as $pregunta) {
-                    $max = DB::select("SELECT MAX(asignado) FROM puntuacions WHERE id_pregunta='$pregunta->id'");
-                    $total = $total + $max[0]->max;
+    
+            return $respuestas;
+        } else {
+            $respuestas = DB::select(
+                "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
+                        u.nombre as nombre_user,
+                        d.nombre as nombre_docente, d.email as email_docente,
+                        t.id as id_test, t.nombre as nombre_test, t.descripcion,
+                        CASE WHEN r.estado=1 THEN 'Recibido' WHEN r.estado=0 THEN 'Pendiente' END
+                FROM respuestas as r, docente_tests as dt, users as d, users as u, tests as t
+                WHERE dt.id=r.id_docente_test AND d.id=dt.id_docente AND u.email=r.email_user AND t.id=dt.id_test AND dt.id_docente='$id'
+                ORDER BY id"
+            );
+    
+            foreach ($respuestas as $respuesta) {
+                //CONSEGUIR PUNTUACION TOTAL
+                $secciones = DB::select("SELECT id FROM seccions WHERE id_test='$respuesta->id_test'");
+                $total = 0;
+                foreach ($secciones as $seccion) {
+                    $preguntas = DB::select("SELECT id FROM preguntas WHERE id_seccion='$seccion->id'");
+                    foreach ($preguntas as $pregunta) {
+                        $max = DB::select("SELECT MAX(asignado) FROM puntuacions WHERE id_pregunta='$pregunta->id'");
+                        $total = $total + $max[0]->max;
+                    }
                 }
+                $respuesta->total = $total;
+    
+                //CONSEGUIR PUNTUACION DEL TEST
+                $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$respuesta->id'");
+                $cont = 0;
+                foreach ($resultados as $resultado) {
+                    $puntuacion = DB::select("SELECT asignado FROM puntuacions WHERE id='$resultado->id_puntuacion'");
+                    $cont = $cont + $puntuacion[0]->asignado;
+                }
+                $respuesta->puntuacion = $cont;
             }
-            $respuesta->total = $total;
-
-            //CONSEGUIR PUNTUACION DEL TEST
-            $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$respuesta->id'");
-            $cont = 0;
-            foreach ($resultados as $resultado) {
-                $puntuacion = DB::select("SELECT asignado FROM puntuacions WHERE id='$resultado->id_puntuacion'");
-                $cont = $cont + $puntuacion[0]->asignado;
-            }
-            $respuesta->puntuacion = $cont;
+    
+            return $respuestas;
         }
-
-        return $respuestas;
     }
 
     public function store(Request $request)
@@ -193,16 +142,30 @@ class RespuestaController extends Controller
         return response()->json(["mensaje" => "se guardo correctamente"], 201);
     }
 
-    public function getFullRespuesta($id)
+    public function show($id)
     {
         $respuesta = DB::select(
-            "SELECT t.id 
-            FROM respuestas r, docente_tests dt, tests t
-            WHERE r.id='$id' AND r.id_docente_test=dt.id AND dt.id_test=t.id"
+            "SELECT r.email_user, r.estado, r.id, r.id_docente_test, 
+            u.nombre as nombre_user, u.edad, u.genero,
+            t.nombre as nombre_test, t.id as id_test
+            FROM respuestas r, users u, docente_tests dt, tests t
+            WHERE r.id='$id' 
+            AND r.email_user=u.email AND r.id_docente_test=dt.id AND dt.id_test=t.id"
         );
-        $idt = $respuesta[0]->id;
-        
-        $test = DB::select("SELECT * FROM tests WHERE id='$idt'");
+
+        $respuesta = $respuesta[0];
+
+        $id_respuesta = $respuesta->id;
+        $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$id_respuesta'");
+        foreach ($resultados as $resultado) {
+            $id_puntuacion = $resultado->id_puntuacion;
+            $puntuacion = DB::select("SELECT * FROM puntuacions WHERE id='$id_puntuacion'");
+            $resultado->puntuacion = $puntuacion;
+        }
+        $respuesta->resultados = $resultados;
+
+        //CONSEGUIR TEST
+        $test = DB::select("SELECT * FROM tests WHERE id='$respuesta->id_test'");
         $test = $test[0];
 
         $id_test = $test->id;
@@ -222,46 +185,7 @@ class RespuestaController extends Controller
         }
 
         $test->secciones = $secciones;
-        return $test;
-
-    }
-
-    public function getIdTest($id)
-    {
-        $respuesta = Respuesta::find($id);
-        $query = DB::select(
-            "SELECT dt.id_test, d.email
-            FROM docente_tests dt, users d
-            WHERE dt.id='$respuesta->id_docente_test' 
-            AND dt.id_docente=d.id"
-        );
-        $respuesta->id_test = $query[0]->id_test;
-        $respuesta->email_docente = $query[0]->email;
-        return $respuesta;
-    }
-
-    public function show($id)
-    {
-        //$respuesta = Respuesta::find($id);
-        $respuesta = DB::select(
-            "SELECT r.email_user, r.estado, r.id, r.id_docente_test, 
-            u.nombre as nombre_user, u.edad, u.genero,
-            t.nombre as nombre_test
-            FROM respuestas r, users u, docente_tests dt, tests t
-            WHERE r.id='$id' 
-            AND r.email_user=u.email AND r.id_docente_test=dt.id AND dt.id_test=t.id"
-        );
-
-        $respuesta = $respuesta[0];
-
-        $id_respuesta = $respuesta->id;
-        $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$id_respuesta'");
-        foreach ($resultados as $resultado) {
-            $id_puntuacion = $resultado->id_puntuacion;
-            $puntuacion = DB::select("SELECT * FROM puntuacions WHERE id='$id_puntuacion'");
-            $resultado->puntuacion = $puntuacion;
-        }
-        $respuesta->resultados = $resultados;
+        $respuesta->test = $test;
 
         return $respuesta;
     }

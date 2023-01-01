@@ -15,45 +15,7 @@ class HorarioController extends Controller
         where h.id_docente=u.id
         ");
     }
-
-    public function showById($id) //MOSTRAR HORARIOS A LOS DOCENTES
-    {
-        $horarios = DB::select("SELECT h.id, h.fecha, h.hora_inicio, h.hora_final, h.disponible, u.email, u.nombre 
-                                from horarios h, users u 
-                                where h.id_docente=u.id and u.id=$id");
-
-        $newHorarios = [];
-        foreach($horarios as $horario) {
-            //USUARIOS DE LAS CITAS DE CADA HORARIO
-            $citas = DB::select("SELECT u.id
-                                 FROM citas c, users u
-                                 WHERE c.id_horario='$horario->id' AND c.id_usuario=u.id");
-
-            if(count($citas) == 0) {
-                //FORMATEAR FECHA
-                $horario->fecha = date_create($horario->fecha);
-                $horario->fecha = date_format($horario->fecha, "d/m/Y");
     
-                //PUSHEAR AL NUEVO ARRAY DE HORARIOS
-                $newHorarios[] = $horario;
-            }
-        }
-
-        return $newHorarios;
-    }
-
-    public function showWhoHaveDateTheProfessor($id) //MOSTRAR CITAS A LOS DOCENTES
-    {
-        $appointments = DB::select("SELECT DISTINCT on (h.id) c.id, c.aceptado, c.id_usuario, h.fecha , h.id as id_horario, h.hora_inicio, h.hora_final, h.disponible, 
-                                    h.id_docente, u.email, u.nombre
-                                    from citas c, horarios h, users u where h.id_docente=$id and c.id_horario=h.id and c.id_usuario = u.id");
-        foreach($appointments as $appointment) {
-            $appointment->fecha = date_create($appointment->fecha);
-            $appointment->fecha = date_format($appointment->fecha, "d/m/Y");
-        }
-        return $appointments;
-    }
-
     public function store(Request $request)
     {
         $request->validate([

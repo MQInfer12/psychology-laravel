@@ -8,24 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class BeneficiarioDocenteController extends Controller
 {
-    public function showTestToProffessor($id) //MOSTRAR TESTS A LOS PROFESORES
-    {
-        $tests = DB::select("SELECT dt.id, dt.id_docente, dt.id_test, t.nombre, t.tiempo, t.descripcion, t.autor
-                             from docente_tests as dt, tests as t 
-                             where dt.id_docente=$id and dt.id_test=t.id");
-
-        foreach($tests as $test) {
-            $id_dt = $test->id;
-            $usuarios = DB::select("SELECT u.id, u.nombre, u.perfil
-                                    FROM users as u, respuestas as r, docente_tests as dt
-                                    WHERE r.email_user = u.email AND r.id_docente_test=dt.id AND dt.id='$id_dt'
-                                    LIMIT 10");
-            $test->usuarios = $usuarios;
-        }  
-
-        return response()->json($tests);
-    }
-
     public function getBenefAssigning($id) //BENEFICIARIOS ASIGNADOS PARA DESASIGNARLOS
     {
         $getIdDocente = DB::select("SELECT bdt.id, bdt.email_user, bdt.id_docente_test, u.email, 
@@ -98,26 +80,5 @@ class BeneficiarioDocenteController extends Controller
             $newObj[$index]->exists = count($exists);
         }
         return response()->json(["msg" => "se ha eliminado", "result" => $newObj], 200);
-    }
-    
-    public function showTestToBenef($id)
-    {
-        $email = DB::select("SELECT email FROM users WHERE id='$id'");
-        $email = $email[0]->email;
-        $respuestas = DB::select("SELECT * FROM respuestas WHERE email_user='$email'");
-
-        foreach($respuestas as $respuesta) {
-            $docente_test = DB::select("SELECT t.id, t.nombre, t.descripcion, t.autor, t.tiempo, u.nombre as nombre_docente
-                                        FROM tests as t, users as u, docente_tests as dt
-                                        WHERE t.id=dt.id_test AND u.id=dt.id_docente AND dt.id='$respuesta->id_docente_test'");
-            $respuesta->nombre_docente = $docente_test[0]->nombre_docente;
-            $respuesta->id_test = $docente_test[0]->id;
-            $respuesta->nombre_test = $docente_test[0]->nombre;
-            $respuesta->descripcion_test = $docente_test[0]->descripcion;
-            $respuesta->autor_test = $docente_test[0]->autor;
-            $respuesta->tiempo_test = $docente_test[0]->tiempo;
-        }
-
-        return $respuestas;
     }
 }

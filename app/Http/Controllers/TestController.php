@@ -8,24 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class TestController extends Controller
 {
-    public function index() //PEDIR TODOS LOS TESTS EN EL ADMINISTRADOR
-    {   
-        $tests = DB::select("SELECT *
-                             FROM tests
-                             ORDER BY id");
-
-        foreach($tests as $test) {
-            $id_test = $test->id;
-            $usuarios = DB::select("SELECT u.id, u.nombre, u.perfil
-                                    FROM users as u, docente_tests as dt
-                                    WHERE dt.id_test = '$id_test' AND dt.id_docente = u.id
-                                    LIMIT 10");
-            $test->usuarios = $usuarios;
-        }        
-
-        return response()->json($tests);
-    }
-    
     public function store(Request $request)
     {
         $request->validate([
@@ -44,12 +26,36 @@ class TestController extends Controller
         return response()->json(["mensaje" => "se guardo correctamente"], 201);
     }
 
-    public function show($id)
+    public function getTestToEdit($id)
     {
-        $showTest = DB::select("SELECT *
-                                FROM tests
-                                WHERE id='$id'");
-        return response()->json($showTest[0]);
+        $test = DB::select(
+            "SELECT *
+            FROM tests
+            WHERE id='$id'"
+        );
+        $test = $test[0];
+        $secciones = DB::select(
+            "SELECT *
+            FROM seccions
+            WHERE id_test='$id'
+            ORDER BY id"
+        );
+        foreach($secciones as $seccion) {
+            $idSeccion = $seccion->id;
+            $preguntas = DB::select("SELECT * FROM preguntas WHERE id_seccion='$idSeccion' ORDER BY id");
+            $reactivos = DB::select("SELECT * FROM reactivos WHERE id_seccion='$idSeccion' ORDER BY id");
+            $puntuaciones = DB::select(
+                "SELECT DISTINCT on (pu.id) pu.id, pu.id_pregunta, pu.id_reactivo, pu.asignado 
+                FROM puntuacions as pu, preguntas as pr, reactivos as r
+                WHERE (pu.id_pregunta=pr.id AND pr.id_seccion='$id') OR (pu.id_reactivo=r.id AND r.id_seccion='$idSeccion')"
+            );
+            $seccion->preguntas = $preguntas;
+            $seccion->reactivos = $reactivos;
+            $seccion->puntuaciones = $puntuaciones;
+        }
+        $test->secciones = $secciones;
+
+        return response()->json($test);
     }
 
     public function update(Request $request, $id)
@@ -75,16 +81,34 @@ class TestController extends Controller
         return Test::destroy($id);
     }
 
-    public function getFullTest($id)
+    public function getFullTest($idUser, $idRespuestaTest)
     {
-        $test = DB::select("SELECT * FROM tests WHERE id='$id'");
+        $user = DB::select("SELECT id_rol FROM users WHERE id='$idUser'");
+        $rol = $user[0]->id_rol;
+
+        if($rol == 1) {
+            $respuesta = DB::select(" 
+                SELECT r.estado, dt.id_test, d.email as email_docente
+                FROM respuestas as r, docente_tests as dt, users as d
+                WHERE r.id='$idRespuestaTest' AND r.id_docente_test=dt.id AND dt.id_docente=d.id
+            ");
+            $idTest = $respuesta[0]->id_test;
+        } else {
+            $idTest = $idRespuestaTest;
+        }
+
+        $test = DB::select("SELECT * FROM tests WHERE id='$idTest'");
         $test = $test[0];
 
-        $id_test = $test->id;
-
-        $caracteristicas = DB::select("SELECT * FROM caracteristicas WHERE id_test='$id_test' ORDER BY id");
+        $caracteristicas = DB::select("SELECT * FROM caracteristicas WHERE id_test='$idTest' ORDER BY id");
         $test->caracteristicas = $caracteristicas;
-        $secciones = DB::select("SELECT id, multimarcado, vacio FROM seccions WHERE id_test='$id_test' ORDER BY id");
+
+        if($rol == 1) {
+            $test->email_docente = $respuesta[0]->email_docente;
+            $test->estado = $respuesta[0]->estado;
+        }
+
+        $secciones = DB::select("SELECT id, multimarcado, vacio FROM seccions WHERE id_test='$idTest' ORDER BY id");
         foreach($secciones as $seccion) {
             $id_seccion = $seccion->id;
             $preguntas =DB::select("SELECT id, descripcion FROM preguntas WHERE id_seccion='$id_seccion' ORDER BY id");
@@ -100,5 +124,61 @@ class TestController extends Controller
 
         $test->secciones = $secciones;
         return $test;
+    }
+
+    public function getTestsForUser($id)
+    {
+        $data = DB::select("SELECT id_rol, email FROM users WHERE id='$id'");
+        $rol = $data[0]->id_rol;
+
+        switch($rol) {
+            case 1:
+                $email = $data[0]->email;
+                $respuestas = DB::select("SELECT * FROM respuestas WHERE email_user='$email'");
+
+                foreach($respuestas as $respuesta) {
+                    $docente_test = DB::select("SELECT t.id, t.nombre, t.descripcion, t.autor, t.tiempo, u.nombre as nombre_docente
+                                                FROM tests as t, users as u, docente_tests as dt
+                                                WHERE t.id=dt.id_test AND u.id=dt.id_docente AND dt.id='$respuesta->id_docente_test'");
+                    $respuesta->nombre_docente = $docente_test[0]->nombre_docente;
+                    $respuesta->id_test = $docente_test[0]->id;
+                    $respuesta->nombre_test = $docente_test[0]->nombre;
+                    $respuesta->descripcion_test = $docente_test[0]->descripcion;
+                    $respuesta->autor_test = $docente_test[0]->autor;
+                    $respuesta->tiempo_test = $docente_test[0]->tiempo;
+                }
+
+                return $respuestas;
+            case 2:
+                $tests = DB::select("SELECT dt.id, dt.id_docente, dt.id_test, t.nombre, t.tiempo, t.descripcion, t.autor
+                             from docente_tests as dt, tests as t 
+                             where dt.id_docente=$id and dt.id_test=t.id");
+
+                foreach($tests as $test) {
+                    $id_dt = $test->id;
+                    $usuarios = DB::select("SELECT u.id, u.nombre, u.perfil
+                                            FROM users as u, respuestas as r, docente_tests as dt
+                                            WHERE r.email_user = u.email AND r.id_docente_test=dt.id AND dt.id='$id_dt'
+                                            LIMIT 10");
+                    $test->usuarios = $usuarios;
+                }  
+
+                return response()->json($tests);
+            case 3:
+                $tests = DB::select("SELECT *
+                             FROM tests
+                             ORDER BY id");
+
+                foreach($tests as $test) {
+                    $id_test = $test->id;
+                    $usuarios = DB::select("SELECT u.id, u.nombre, u.perfil
+                                            FROM users as u, docente_tests as dt
+                                            WHERE dt.id_test = '$id_test' AND dt.id_docente = u.id
+                                            LIMIT 10");
+                    $test->usuarios = $usuarios;
+                }        
+
+                return response()->json($tests);
+        }
     }
 }

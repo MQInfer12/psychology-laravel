@@ -40,7 +40,7 @@ class PreguntaController extends Controller
             $puntuacion = new Puntuacion();
             $puntuacion->id_pregunta = $id_pregunta;
             $puntuacion->id_reactivo = $reactivo->id;
-            $puntuacion->asignado = 0;
+            $puntuacion->asignado = $reactivo->predeterminado;
             $puntuacion->save();
         }
 
