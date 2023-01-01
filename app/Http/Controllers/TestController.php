@@ -42,16 +42,13 @@ class TestController extends Controller
         );
         foreach($secciones as $seccion) {
             $idSeccion = $seccion->id;
-            $preguntas = DB::select("SELECT * FROM preguntas WHERE id_seccion='$idSeccion' ORDER BY id");
-            $reactivos = DB::select("SELECT * FROM reactivos WHERE id_seccion='$idSeccion' ORDER BY id");
-            $puntuaciones = DB::select(
+            $seccion->preguntas = DB::select("SELECT * FROM preguntas WHERE id_seccion='$idSeccion' ORDER BY id");
+            $seccion->reactivos = DB::select("SELECT * FROM reactivos WHERE id_seccion='$idSeccion' ORDER BY id");
+            $seccion->puntuaciones = DB::select(
                 "SELECT DISTINCT on (pu.id) pu.id, pu.id_pregunta, pu.id_reactivo, pu.asignado 
                 FROM puntuacions as pu, preguntas as pr, reactivos as r
                 WHERE (pu.id_pregunta=pr.id AND pr.id_seccion='$id') OR (pu.id_reactivo=r.id AND r.id_seccion='$idSeccion')"
             );
-            $seccion->preguntas = $preguntas;
-            $seccion->reactivos = $reactivos;
-            $seccion->puntuaciones = $puntuaciones;
         }
         $test->secciones = $secciones;
 

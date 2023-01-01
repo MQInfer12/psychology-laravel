@@ -12,25 +12,7 @@ class SeccionController extends Controller
     {
         return Seccion::all();
     }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'id_test' => 'required',
-        ]);
-
-        $seccion = new Seccion();
-        $seccion->id_test = $request->id_test;
-        $seccion->save();
-
-        return response()->json(["mensaje" => "se guardo correctamente"], 201);
-    }
-
-    public function destroy($id)
-    {
-        return Seccion::destroy($id);
-    }
-
+    
     public function getFullSeccion($id)
     {
         $seccion = DB::select("SELECT * FROM seccions WHERE id='$id'")[0];
@@ -45,6 +27,26 @@ class SeccionController extends Controller
         $seccion->reactivos = $reactivos;
         $seccion->puntuaciones = $puntuaciones;
         return $seccion;
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'id_test' => 'required',
+        ]);
+
+        $seccion = new Seccion();
+        $seccion->id_test = $request->id_test;
+        $seccion->save();
+
+        $seccion = $this->getFullSeccion($seccion->id);
+
+        return response()->json(["mensaje" => "se guardo correctamente", "seccion" => $seccion], 201);
+    }
+
+    public function destroy($id)
+    {
+        return Seccion::destroy($id);
     }
 
     public function seccionByTest($idTest) 
