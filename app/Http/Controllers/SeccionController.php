@@ -41,7 +41,7 @@ class SeccionController extends Controller
 
         $seccion = $this->getFullSeccion($seccion->id);
 
-        return response()->json(["mensaje" => "se guardo correctamente", "seccion" => $seccion], 201);
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $seccion], 201);
     }
 
     public function destroy($id)

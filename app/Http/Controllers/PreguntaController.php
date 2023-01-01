@@ -45,7 +45,7 @@ class PreguntaController extends Controller
         }
 
         //RETORNAR
-        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $pregunta], 201);
     }
 
     public function update(Request $request, $id)
@@ -60,7 +60,7 @@ class PreguntaController extends Controller
         $pregunta->descripcion = $request->descripcion;
         $pregunta->save();
 
-        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $pregunta], 201);
     }
 
     public function destroy($id)
