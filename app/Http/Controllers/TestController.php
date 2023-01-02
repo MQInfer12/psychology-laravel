@@ -32,8 +32,7 @@ class TestController extends Controller
             "SELECT *
             FROM tests
             WHERE id='$id'"
-        );
-        $test = $test[0];
+        )[0];
         $secciones = DB::select(
             "SELECT *
             FROM seccions

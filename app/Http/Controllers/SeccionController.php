@@ -76,4 +76,18 @@ class SeccionController extends Controller
 
         return response()->json(["mensaje" => "se guardo correctamente"], 201);
     }
+
+    public function changeOrden()
+    {
+        $tests = DB::select("SELECT * FROM tests");
+        foreach($tests as $test) {
+            $secciones = DB::select("SELECT * FROM seccions WHERE id_test='$test->id' ORDER BY id");
+            $cont = 1;
+            foreach($secciones as $seccion) {
+                DB::update("UPDATE seccions SET orden='$cont' WHERE id='$seccion->id'");
+                $cont = $cont + 1;
+            }
+            $cont = 1;
+        }
+    }
 } 

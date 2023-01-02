@@ -78,7 +78,6 @@ Route::group(['middleware' => 'api'], function(){
     Route::put("reactivo/predeterminado/{id}", [ReactivoController::class, 'changePredeterminado']);
 
     //SECCIONES ROUTES
-    Route::get("seccion/full/{id}", [SeccionController::class, 'getFullSeccion']);
     Route::put("seccion/multimarcado/{id}", [SeccionController::class, 'changeMultimarcado']);
     Route::put("seccion/vacio/{id}", [SeccionController::class, 'changeVacio']);
 
@@ -106,4 +105,7 @@ Route::group(['middleware' => 'api'], function(){
     Route::apiResource("articulo", ArticuloController::class);
     Route::get('articulo/docente/{id_docente}', [ArticuloController::class, 'getArticlesByDocente']);
     Route::get('articulo/documento/{id}', [ArticuloController::class, 'getArticlePdf']);
+
+    //CHANGERS
+    Route::get('changeOrden', [SeccionController::class, 'changeOrden']);
 });
