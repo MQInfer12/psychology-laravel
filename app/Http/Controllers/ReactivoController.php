@@ -29,6 +29,7 @@ class ReactivoController extends Controller
         $reactivo = new Reactivo();
         $reactivo->id_seccion = $request->id_seccion;
         $reactivo->descripcion = $request->descripcion;
+        $reactivo->predeterminado = 0;
         $reactivo->save();
 
         //AÑADIR PUNTUACIONES DEL REACTIVO DEPENDIENDO DE CUANTAS PREGUNTAS HAYA
@@ -36,16 +37,23 @@ class ReactivoController extends Controller
         $id_seccion = $request->id_seccion;
         $preguntas = DB::select("SELECT * FROM preguntas WHERE id_seccion='$id_seccion' ORDER BY id");
 
+        $puntuaciones = [];
         foreach($preguntas as $pregunta) {
             $puntuacion = new Puntuacion();
             $puntuacion->id_pregunta = $pregunta->id;
             $puntuacion->id_reactivo = $id_reactivo;
             $puntuacion->asignado = 0;
             $puntuacion->save();
+            $puntuaciones[] = $puntuacion;
         }
 
+        $data = array(
+            "reactivo" => $reactivo,
+            "puntuaciones" => $puntuaciones
+        );
+
         //RETORNAR
-        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $data], 201);
     }
 
     public function update(Request $request, $id)
@@ -55,12 +63,12 @@ class ReactivoController extends Controller
             "descripcion" => "required"
         ]);
 
-        $pregunta = Reactivo::findOrFail($id);
-        $pregunta->id_seccion = $request->id_seccion;
-        $pregunta->descripcion = $request->descripcion;
-        $pregunta->save();
+        $reactivo = Reactivo::findOrFail($id);
+        $reactivo->id_seccion = $request->id_seccion;
+        $reactivo->descripcion = $request->descripcion;
+        $reactivo->save();
 
-        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $reactivo], 201);
     }
 
     public function destroy($id)
@@ -77,6 +85,6 @@ class ReactivoController extends Controller
         DB::update("UPDATE reactivos SET predeterminado='$request->predeterminado' WHERE id='$id'");
         DB::select("UPDATE puntuacions SET asignado='$request->predeterminado' WHERE id_reactivo='$id'");
 
-        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $request->predeterminado], 201);
     }
 }
