@@ -106,6 +106,6 @@ Route::group(['middleware' => 'api'], function(){
     Route::get('articulo/docente/{id_docente}', [ArticuloController::class, 'getArticlesByDocente']);
     Route::get('articulo/documento/{id}', [ArticuloController::class, 'getArticlePdf']);
 
-    //CHANGERS
-    Route::get('changeOrden', [SeccionController::class, 'changeOrden']);
+    //CHANGECOLUMNS
+    Route::get('change', [SeccionController::class, 'change']);
 });

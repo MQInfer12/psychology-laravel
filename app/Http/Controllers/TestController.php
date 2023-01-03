@@ -37,7 +37,7 @@ class TestController extends Controller
             "SELECT *
             FROM seccions
             WHERE id_test='$id'
-            ORDER BY id"
+            ORDER BY orden"
         );
         foreach($secciones as $seccion) {
             $idSeccion = $seccion->id;
