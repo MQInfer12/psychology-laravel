@@ -170,7 +170,7 @@ class RespuestaController extends Controller
 
         $id_test = $test->id;
 
-        $secciones = DB::select("SELECT id, multimarcado FROM seccions WHERE id_test='$id_test' ORDER BY id");
+        $secciones = DB::select("SELECT id, multimarcado, nombre FROM seccions WHERE id_test='$id_test' ORDER BY orden");
         foreach($secciones as $seccion) {
             $id_seccion = $seccion->id;
             $preguntas =DB::select("SELECT id, descripcion FROM preguntas WHERE id_seccion='$id_seccion' ORDER BY id");

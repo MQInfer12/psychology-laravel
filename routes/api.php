@@ -80,6 +80,7 @@ Route::group(['middleware' => 'api'], function(){
     //SECCIONES ROUTES
     Route::put("seccion/multimarcado/{id}", [SeccionController::class, 'changeMultimarcado']);
     Route::put("seccion/vacio/{id}", [SeccionController::class, 'changeVacio']);
+    Route::put("seccion/change/orden", [SeccionController::class, 'changeOrden']);
 
     //PUNTUACIONES ROUTES
     Route::post("puntuacion/reactivo", [PuntuacionController::class, 'puntuacionesByReactivos']);
@@ -107,5 +108,5 @@ Route::group(['middleware' => 'api'], function(){
     Route::get('articulo/documento/{id}', [ArticuloController::class, 'getArticlePdf']);
 
     //CHANGECOLUMNS
-    Route::get('change', [SeccionController::class, 'change']);
+    /* Route::get('change', [SeccionController::class, 'change']); */
 });
