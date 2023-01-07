@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Pregunta;
 use App\Models\Puntuacion;
+use App\Traits\PuntuacionesNaturales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PreguntaController extends Controller
 {
+    use PuntuacionesNaturales;
+
     public function index()
     {
         return Pregunta::all();
@@ -78,11 +81,23 @@ class PreguntaController extends Controller
     public function massDestroy(Request $request)
     {
         $objeto = $request->objeto;
-
+        
+        $dimensiones = [];
         foreach($objeto as $valor) {
+            $idsDimensiones = DB::select(
+                "SELECT d.id 
+                FROM dimensions as d, preguntas as p, pregunta_dimensions as pd
+                WHERE p.id='$valor' AND pd.id_pregunta=p.id AND pd.id_dimension=d.id"
+            );
+            foreach($idsDimensiones as $idDimension) {
+                if(!in_array($idDimension, $dimensiones)) {
+                    $dimensiones[] = $idDimension;
+                }
+            }
             Pregunta::destroy($valor);
         }
+        $naturales = $this->getPuntuacionesNaturales($dimensiones);
 
-        return response()->json(["mensaje" => "se borro correctamente"], 201);
+        return response()->json(["mensaje" => "se borro correctamente", "data" => $naturales], 201);
     }
 }

@@ -61,14 +61,7 @@ class PuntuacionController extends Controller
             }
         }
 
-        $naturales = [];
-        foreach($dimensiones as $dimension) {
-            $natural = $this->getPuntuacionNatural($dimension->id);
-            $naturales[] = array(
-                "id" => $dimension->id,
-                "valores" => $natural
-            );
-        }
+        $naturales = $this->getPuntuacionesNaturales($dimensiones);
 
         return response()->json(["mensaje" => "se guardo correctamente", "data" => $naturales], 201);
     }

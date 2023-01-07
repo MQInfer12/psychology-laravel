@@ -86,14 +86,7 @@ class SeccionController extends Controller
             FROM preguntas as p, pregunta_dimensions as pd, dimensions as d 
             WHERE p.id_seccion='$id' AND pd.id_pregunta=p.id AND pd.id_dimension=d.id"
         );
-        $naturales = [];
-        foreach($dimensiones as $dimension) {
-            $natural = $this->getPuntuacionNatural($dimension->id);
-            $naturales[] = array(
-                "id" => $dimension->id,
-                "valores" => $natural
-            );
-        }
+        $naturales = $this->getPuntuacionesNaturales($dimensiones);
 
         return response()->json(["mensaje" => "se guardo correctamente", "data" => $naturales], 201);
     }

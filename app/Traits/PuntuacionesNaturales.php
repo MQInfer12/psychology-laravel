@@ -7,6 +7,18 @@ use App\Models\Puntuacion;
 use Illuminate\Support\Facades\DB;
 
   trait PuntuacionesNaturales {
+    public function getPuntuacionesNaturales($dimensiones) {
+        $naturales = [];
+        foreach($dimensiones as $dimension) {
+            $natural = $this->getPuntuacionNatural($dimension->id);
+            $naturales[] = array(
+                "id" => $dimension->id,
+                "valores" => $natural
+            );
+        }
+        return $naturales;
+    }
+
     public function getPuntuacionNatural($id) {
         $preguntas = PreguntaDimension::where('id_dimension',$id)->pluck('id_pregunta')->toArray();
         $natural = [];

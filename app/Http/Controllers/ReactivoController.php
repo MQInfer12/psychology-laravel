@@ -50,9 +50,17 @@ class ReactivoController extends Controller
             $puntuaciones[] = $puntuacion;
         }
 
+        $dimensiones = DB::select(
+            "SELECT d.id
+            FROM reactivos as r, puntuacions as pt, preguntas as pr, pregunta_dimensions as pd, dimensions as d
+            WHERE r.id='$id_reactivo' AND pt.id_reactivo=r.id AND pt.id_pregunta=pr.id AND pd.id_pregunta=pr.id AND pd.id_dimension=d.id"
+        );
+        $naturales = $this->getPuntuacionesNaturales($dimensiones);
+
         $data = array(
             "reactivo" => $reactivo,
-            "puntuaciones" => $puntuaciones
+            "puntuaciones" => $puntuaciones,
+            "valores" => $naturales
         );
 
         //RETORNAR
@@ -76,7 +84,14 @@ class ReactivoController extends Controller
 
     public function destroy($id)
     {
-        return Reactivo::destroy($id);
+        $dimensiones = DB::select(
+            "SELECT d.id
+            FROM reactivos as r, puntuacions as pt, preguntas as pr, pregunta_dimensions as pd, dimensions as d
+            WHERE r.id='$id' AND pt.id_reactivo=r.id AND pt.id_pregunta=pr.id AND pd.id_pregunta=pr.id AND pd.id_dimension=d.id"
+        );
+        Reactivo::destroy($id);
+        $naturales = $this->getPuntuacionesNaturales($dimensiones);
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $naturales], 201);
     }
 
     public function changePredeterminado(Request $request, $id)
@@ -93,14 +108,7 @@ class ReactivoController extends Controller
             FROM reactivos as r, puntuacions as pt, preguntas as pr, pregunta_dimensions as pd, dimensions as d
             WHERE r.id='$id' AND pt.id_reactivo=r.id AND pt.id_pregunta=pr.id AND pd.id_pregunta=pr.id AND pd.id_dimension=d.id"
         );
-        $naturales = [];
-        foreach($dimensiones as $dimension) {
-            $natural = $this->getPuntuacionNatural($dimension->id);
-            $naturales[] = array(
-                "id" => $dimension->id,
-                "valores" => $natural
-            );
-        }
+        $naturales = $this->getPuntuacionesNaturales($dimensiones);
 
         $data = array(
             "predeterminado" => $request->predeterminado,
