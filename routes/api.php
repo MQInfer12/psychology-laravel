@@ -5,11 +5,13 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeneficiarioDocenteController;
 use App\Http\Controllers\CaracteristicaController;
 use App\Http\Controllers\CitaController;
+use App\Http\Controllers\DimensionController;
 use App\Http\Controllers\DocenteTestController;
 use App\Http\Controllers\GrupoBeneficiarioController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\PreguntaController;
+use App\Http\Controllers\PreguntaDimensionController;
 use App\Http\Controllers\PuntuacionController;
 use App\Http\Controllers\ReactivoController;
 use App\Http\Controllers\RespuestaController;
@@ -87,6 +89,10 @@ Route::group(['middleware' => 'api'], function(){
     Route::get("puntuacion/seccion/{id}", [PuntuacionController::class, 'puntuacionesBySeccion']);
     Route::put("puntuacion/update", [PuntuacionController::class, 'massUpdate']);
     Route::put("puntuacion/voltear/{idPregunta}", [PuntuacionController::class, 'voltearPuntuaciones']);
+
+    //DIMENSIONES ROUTES
+    Route::apiResource("dimension", DimensionController::class);
+    Route::put("pregunta/dimension/{id}", [PreguntaDimensionController::class, 'storeVarious']);
 
     //RESPUESTA ROUTES
     Route::apiResource("respuesta", RespuestaController::class);

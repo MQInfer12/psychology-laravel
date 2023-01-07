@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PreguntaDimension;
 use App\Models\Test;
+use App\Traits\PuntuacionesNaturales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TestController extends Controller
 {
+    use PuntuacionesNaturales;
+
     public function store(Request $request)
     {
         $request->validate([
@@ -33,6 +37,23 @@ class TestController extends Controller
             FROM tests
             WHERE id='$id'"
         )[0];
+
+        $dimensiones = DB::select("SELECT * FROM dimensions WHERE id_test='$id' ORDER BY id");
+        $test->dimensiones = $dimensiones;
+        foreach($dimensiones as $dimension) {
+            $preguntasPorDimension = DB::select("SELECT id_pregunta FROM pregunta_dimensions WHERE id_dimension='$dimension->id'");
+            $idsPreguntas = [];
+            foreach($preguntasPorDimension as $pregunta) {
+                $idsPreguntas[] = $pregunta->id_pregunta;
+            }
+            $dimension->preguntas = $idsPreguntas;
+
+            //CALCULAR ESCALA NATURAL DE CADA DIMENSION
+            $preguntasPorDimension = PreguntaDimension::where('id_dimension',$dimension->id)->pluck('id_pregunta')->toArray();
+            $natural = $this->getPuntuacionNatural($dimension->id);
+            $dimension->escalas = [array("nombre" => "Natural", "valores" => $natural)];
+        }
+
         $secciones = DB::select(
             "SELECT *
             FROM seccions

@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Puntuacion;
 use App\Models\Reactivo;
+use App\Traits\PuntuacionesNaturales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ReactivoController extends Controller
 {
+    use PuntuacionesNaturales;
+
     public function index()
     {
         return Reactivo::all();
@@ -85,6 +88,25 @@ class ReactivoController extends Controller
         DB::update("UPDATE reactivos SET predeterminado='$request->predeterminado' WHERE id='$id'");
         DB::select("UPDATE puntuacions SET asignado='$request->predeterminado' WHERE id_reactivo='$id'");
 
-        return response()->json(["mensaje" => "se guardo correctamente", "data" => $request->predeterminado], 201);
+        $dimensiones = DB::select(
+            "SELECT d.id
+            FROM reactivos as r, puntuacions as pt, preguntas as pr, pregunta_dimensions as pd, dimensions as d
+            WHERE r.id='$id' AND pt.id_reactivo=r.id AND pt.id_pregunta=pr.id AND pd.id_pregunta=pr.id AND pd.id_dimension=d.id"
+        );
+        $naturales = [];
+        foreach($dimensiones as $dimension) {
+            $natural = $this->getPuntuacionNatural($dimension->id);
+            $naturales[] = array(
+                "id" => $dimension->id,
+                "valores" => $natural
+            );
+        }
+
+        $data = array(
+            "predeterminado" => $request->predeterminado,
+            "valores" => $naturales
+        );
+
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $data], 201);
     }
 }

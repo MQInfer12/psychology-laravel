@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Puntuacion;
+use App\Traits\PuntuacionesNaturales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PuntuacionController extends Controller
 {
+    use PuntuacionesNaturales;
+
     public function puntuacionesByReactivos(Request $request)
     {
         $reactivos = $request->reactivos;
@@ -39,12 +42,35 @@ class PuntuacionController extends Controller
     public function massUpdate(Request $request)
     {
         $puntuaciones = $request->puntuaciones;
+        $dimensiones = [];
         foreach($puntuaciones as $puntuacion) {
             $new = Puntuacion::findOrFail($puntuacion['id']);
             $new->asignado = $puntuacion['asignado'];
             $new->save();
+
+            $idPregunta = $puntuacion['id_pregunta'];
+            $idsDimensiones = DB::select(
+                "SELECT d.id 
+                FROM dimensions as d, preguntas as p, pregunta_dimensions as pd
+                WHERE p.id='$idPregunta' AND pd.id_pregunta=p.id AND pd.id_dimension=d.id"
+            );
+            foreach($idsDimensiones as $idDimension) {
+                if(!in_array($idDimension, $dimensiones)) {
+                    $dimensiones[] = $idDimension;
+                }
+            }
         }
-        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+
+        $naturales = [];
+        foreach($dimensiones as $dimension) {
+            $natural = $this->getPuntuacionNatural($dimension->id);
+            $naturales[] = array(
+                "id" => $dimension->id,
+                "valores" => $natural
+            );
+        }
+
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $naturales], 201);
     }
 
     public function voltearPuntuaciones($idPregunta)
