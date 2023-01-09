@@ -72,7 +72,14 @@ class SeccionController extends Controller
         $seccion->multimarcado = !$multimarcado;
         $seccion->save();
 
-        return response()->json(["mensaje" => "se guardo correctamente"], 201);
+        $dimensiones = DB::select(
+            "SELECT DISTINCT ON (d.id) d.id
+            FROM preguntas as p, pregunta_dimensions as pd, dimensions as d 
+            WHERE p.id_seccion='$id' AND pd.id_pregunta=p.id AND pd.id_dimension=d.id"
+        );
+        $naturales = $this->getPuntuacionesNaturales($dimensiones);
+
+        return response()->json(["mensaje" => "se guardo correctamente", "data" => $naturales], 201);
     }
 
     public function changeVacio($id) 

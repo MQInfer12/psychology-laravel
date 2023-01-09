@@ -6,7 +6,7 @@ use App\Models\PreguntaDimension;
 use App\Models\Puntuacion;
 use Illuminate\Support\Facades\DB;
 
-  trait PuntuacionesNaturales {
+trait PuntuacionesNaturales {
     public function getPuntuacionesNaturales($dimensiones) {
         $naturales = [];
         foreach($dimensiones as $dimension) {
@@ -26,10 +26,14 @@ use Illuminate\Support\Facades\DB;
             $arrayDeArrays = [];
             foreach($preguntas as $pregunta) {
                 $array = Puntuacion::where('id_pregunta', $pregunta)->pluck('asignado')->toArray();
-                $vacio = DB::select("SELECT s.vacio FROM seccions as s, preguntas as p WHERE p.id_seccion=s.id AND p.id='$pregunta'")[0]->vacio;
-                if($vacio) {
+                $options = DB::select("SELECT s.vacio, s.multimarcado FROM seccions as s, preguntas as p WHERE p.id_seccion=s.id AND p.id='$pregunta'")[0];
+                $vacio = $options->vacio;
+                $multimarcado = $options->multimarcado;
+                if($multimarcado) {
+                    $array = $this->possibleCombinations($array);
+                }
+                if($vacio && !in_array(0, $array)) {
                     $array[] = 0;
-                    $array = array_unique($array);
                 }
                 $arrayDeArrays[] = $array;
             }
@@ -43,21 +47,44 @@ use Illuminate\Support\Facades\DB;
     }
 
     public function calcularPosibilidad($arrayDeArrays, $index) {
-      if(count($arrayDeArrays) - 1 === $index) {
-          return array_unique($arrayDeArrays[$index]);
-      } else {
-          $posibilidadesNuevas = [];
-          $primerVector = $arrayDeArrays[$index];
-          $segundoVector = $this->calcularPosibilidad($arrayDeArrays, $index + 1);
-          foreach($primerVector as $primero) {
-              foreach($segundoVector as $segundo) {
-                  $posibilidad = $primero + $segundo;
-                  if(!in_array($posibilidad, $posibilidadesNuevas)) {
-                      $posibilidadesNuevas[] = $posibilidad;
-                  }
-              }
-          }
-          return $posibilidadesNuevas;
-      }
+        if(count($arrayDeArrays) - 1 === $index) {
+            return array_unique($arrayDeArrays[$index]);
+        } else {
+            $primerArray = $arrayDeArrays[$index];
+            $segundoArray = $this->calcularPosibilidad($arrayDeArrays, $index + 1);
+            $posibilidadesNuevas = $this->sumarArrays($primerArray, $segundoArray);
+            return $posibilidadesNuevas;
+        }
     }
-  }
+
+    public function sumarArrays($primerArray, $segundoArray) {
+        $arrayNuevo = [];
+        foreach($primerArray as $primero) {
+            foreach($segundoArray as $segundo) {
+                $posibilidad = $primero + $segundo;
+                if(!in_array($posibilidad, $arrayNuevo)) {
+                    $arrayNuevo[] = $posibilidad;
+                }
+            }
+        }
+        return $arrayNuevo;
+    }
+
+    public function possibleCombinations($array) {
+        $combinations = [];
+        $iterations = pow(2, count($array));
+        for($i = 1; $i < $iterations; $i++) {
+            $bin = sprintf("%0".count($array)."d", decbin($i));
+            $combination = 0;
+            for($j = 0; $j < strlen($bin); $j++) {
+                if(intval($bin[$j])) {
+                    $combination += $array[$j];
+                }
+            }
+            if(!in_array($combination, $combinations)) {
+                $combinations[] = $combination;
+            }
+        }
+        return $combinations;
+    }
+}

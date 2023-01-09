@@ -41,15 +41,10 @@ class TestController extends Controller
         $dimensiones = DB::select("SELECT * FROM dimensions WHERE id_test='$id' ORDER BY id");
         $test->dimensiones = $dimensiones;
         foreach($dimensiones as $dimension) {
-            $preguntasPorDimension = DB::select("SELECT id_pregunta FROM pregunta_dimensions WHERE id_dimension='$dimension->id'");
-            $idsPreguntas = [];
-            foreach($preguntasPorDimension as $pregunta) {
-                $idsPreguntas[] = $pregunta->id_pregunta;
-            }
-            $dimension->preguntas = $idsPreguntas;
+            $preguntasPorDimension = PreguntaDimension::where('id_dimension',$dimension->id)->pluck('id_pregunta')->toArray();
+            $dimension->preguntas = $preguntasPorDimension;
 
             //CALCULAR ESCALA NATURAL DE CADA DIMENSION
-            $preguntasPorDimension = PreguntaDimension::where('id_dimension',$dimension->id)->pluck('id_pregunta')->toArray();
             $natural = $this->getPuntuacionNatural($dimension->id);
             $dimension->escalas = [array("nombre" => "Natural", "valores" => $natural)];
         }

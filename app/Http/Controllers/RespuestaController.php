@@ -151,33 +151,20 @@ class RespuestaController extends Controller
             FROM respuestas r, users u, docente_tests dt, tests t
             WHERE r.id='$id' 
             AND r.email_user=u.email AND r.id_docente_test=dt.id AND dt.id_test=t.id"
-        );
-
-        $respuesta = $respuesta[0];
-
-        $id_respuesta = $respuesta->id;
-        $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$id_respuesta'");
-        foreach ($resultados as $resultado) {
-            $id_puntuacion = $resultado->id_puntuacion;
-            $puntuacion = DB::select("SELECT * FROM puntuacions WHERE id='$id_puntuacion'");
-            $resultado->puntuacion = $puntuacion;
-        }
-        $respuesta->resultados = $resultados;
+        )[0];
 
         //CONSEGUIR TEST
         $test = DB::select("SELECT * FROM tests WHERE id='$respuesta->id_test'");
         $test = $test[0];
 
-        $id_test = $test->id;
-
-        $secciones = DB::select("SELECT id, multimarcado, nombre FROM seccions WHERE id_test='$id_test' ORDER BY orden");
+        $secciones = DB::select("SELECT id, multimarcado, nombre FROM seccions WHERE id_test='$test->id' ORDER BY orden");
+        $idsPreguntas = [];
         foreach($secciones as $seccion) {
-            $id_seccion = $seccion->id;
-            $preguntas =DB::select("SELECT id, descripcion FROM preguntas WHERE id_seccion='$id_seccion' ORDER BY id");
-            $reactivos =DB::select("SELECT id, descripcion FROM reactivos WHERE id_seccion='$id_seccion' ORDER BY id");
+            $preguntas =DB::select("SELECT id, descripcion FROM preguntas WHERE id_seccion='$seccion->id' ORDER BY id");
+            $reactivos =DB::select("SELECT id, descripcion FROM reactivos WHERE id_seccion='$seccion->id' ORDER BY id");
             foreach($preguntas as $pregunta) {
-                $id_pregunta = $pregunta->id;
-                $puntuaciones = DB::select("SELECT id, id_reactivo, asignado FROM puntuacions WHERE id_pregunta='$id_pregunta' ORDER BY id_reactivo");
+                $idsPreguntas[] = $pregunta->id;
+                $puntuaciones = DB::select("SELECT id, id_reactivo, asignado FROM puntuacions WHERE id_pregunta='$pregunta->id' ORDER BY id_reactivo");
                 $pregunta->puntuaciones = $puntuaciones;
             }
             $seccion->preguntas = $preguntas;
@@ -185,6 +172,46 @@ class RespuestaController extends Controller
         }
 
         $test->secciones = $secciones;
+
+        $resultados = DB::select(
+            "SELECT r.id, r.id_respuesta, r.id_puntuacion, p.id_pregunta, p.id_reactivo, p.asignado
+            FROM resultados as r, puntuacions as p
+            WHERE r.id_respuesta='$respuesta->id' AND r.id_puntuacion=p.id"
+        );
+
+        //IDENTIFICAR PREGUNTAS SIN RESPUESTA PARA PONERLES 0 DE ASIGNADO Y REPETIDAS PARA SUMAR SUS PUNTUACIONES
+        $idsRepetidos = [];
+        $idsPreguntasInResultados = [];
+        foreach($resultados as $resultado) 
+        {
+            if(in_array($resultado->id_pregunta, $idsPreguntasInResultados) && !in_array($resultado->id_pregunta, $idsRepetidos)) {
+                $idsRepetidos[] = $resultado->id_pregunta;
+            }
+            $idsPreguntasInResultados[] = $resultado->id_pregunta;
+        }
+        $repetidosPorId = [];
+        foreach($resultados as $resultado) {
+            if(in_array($resultado->id_pregunta, $idsRepetidos)) {
+                $repetidosPorId[$resultado->id_pregunta][] = $resultado;
+            }
+        }
+        foreach($repetidosPorId as $idRepetido) {
+            $asignados = array_column($idRepetido, "asignado");
+            foreach($idRepetido as $resultado) {
+                $resultado->asignado = array_sum($asignados);
+            }
+        }
+
+        foreach($idsPreguntas as $idPregunta) {
+            if(!in_array($idPregunta, $idsPreguntasInResultados)) {
+                $resultados[] = array(
+                    "id_pregunta" => $idPregunta,
+                    "asignado" => 0
+                );
+            }
+        }
+
+        $respuesta->resultados = $resultados;
         $respuesta->test = $test;
 
         return $respuesta;
