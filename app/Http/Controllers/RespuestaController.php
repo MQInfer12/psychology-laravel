@@ -16,7 +16,7 @@ class RespuestaController extends Controller
 
         if($rol == 3) {
             $respuestas = DB::select(
-                "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
+                "SELECT r.id, r.email_user, r.id_docente_test, r.estado,
                         u.nombre as nombre_user,
                         d.nombre as nombre_docente, d.email as email_docente,
                         t.id as id_test, t.nombre as nombre_test, t.descripcion,
@@ -25,34 +25,9 @@ class RespuestaController extends Controller
                 WHERE dt.id=r.id_docente_test AND d.id=dt.id_docente AND u.email=r.email_user AND t.id=dt.id_test
                 ORDER BY id"
             );
-    
-            foreach ($respuestas as $respuesta) {
-                //CONSEGUIR PUNTUACION TOTAL
-                $secciones = DB::select("SELECT id FROM seccions WHERE id_test='$respuesta->id_test'");
-                $total = 0;
-                foreach ($secciones as $seccion) {
-                    $preguntas = DB::select("SELECT id FROM preguntas WHERE id_seccion='$seccion->id'");
-                    foreach ($preguntas as $pregunta) {
-                        $max = DB::select("SELECT MAX(asignado) FROM puntuacions WHERE id_pregunta='$pregunta->id'");
-                        $total = $total + $max[0]->max;
-                    }
-                }
-                $respuesta->total = $total;
-    
-                //CONSEGUIR PUNTUACION DEL TEST
-                $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$respuesta->id'");
-                $cont = 0;
-                foreach ($resultados as $resultado) {
-                    $puntuacion = DB::select("SELECT asignado FROM puntuacions WHERE id='$resultado->id_puntuacion'");
-                    $cont = $cont + $puntuacion[0]->asignado;
-                }
-                $respuesta->puntuacion = $cont;
-            }
-    
-            return $respuestas;
         } else {
             $respuestas = DB::select(
-                "SELECT r.id, r.email_user, r.id_docente_test, r.estado, 
+                "SELECT r.id, r.email_user, r.id_docente_test, r.estado,
                         u.nombre as nombre_user,
                         d.nombre as nombre_docente, d.email as email_docente,
                         t.id as id_test, t.nombre as nombre_test, t.descripcion,
@@ -61,32 +36,29 @@ class RespuestaController extends Controller
                 WHERE dt.id=r.id_docente_test AND d.id=dt.id_docente AND u.email=r.email_user AND t.id=dt.id_test AND dt.id_docente='$id'
                 ORDER BY id"
             );
-    
-            foreach ($respuestas as $respuesta) {
-                //CONSEGUIR PUNTUACION TOTAL
-                $secciones = DB::select("SELECT id FROM seccions WHERE id_test='$respuesta->id_test'");
-                $total = 0;
-                foreach ($secciones as $seccion) {
-                    $preguntas = DB::select("SELECT id FROM preguntas WHERE id_seccion='$seccion->id'");
-                    foreach ($preguntas as $pregunta) {
-                        $max = DB::select("SELECT MAX(asignado) FROM puntuacions WHERE id_pregunta='$pregunta->id'");
-                        $total = $total + $max[0]->max;
-                    }
-                }
-                $respuesta->total = $total;
-    
-                //CONSEGUIR PUNTUACION DEL TEST
-                $resultados = DB::select("SELECT * FROM resultados WHERE id_respuesta='$respuesta->id'");
-                $cont = 0;
-                foreach ($resultados as $resultado) {
-                    $puntuacion = DB::select("SELECT asignado FROM puntuacions WHERE id='$resultado->id_puntuacion'");
-                    $cont = $cont + $puntuacion[0]->asignado;
-                }
-                $respuesta->puntuacion = $cont;
-            }
-    
-            return $respuestas;
         }
+        
+        foreach ($respuestas as $respuesta) {
+            //CONSEGUIR PUNTUACION TOTAL
+            $total = DB::select(
+                "SELECT SUM(pregunta.maximo)
+                 FROM (SELECT MAX(pu.asignado) as maximo
+                    FROM puntuacions as pu, seccions as s, preguntas as pr
+                    WHERE s.id_test='$respuesta->id_test' AND pr.id_seccion=s.id AND pu.id_pregunta=pr.id
+                    GROUP BY pr.id) as pregunta"
+            )[0]->sum;
+            $respuesta->total = $total;
+
+            //CONSEGUIR PUNTUACION DEL TEST
+            $suma = DB::select(
+                "SELECT SUM(p.asignado) 
+                FROM resultados as r, puntuacions as p
+                WHERE r.id_respuesta='$respuesta->id' AND r.id_puntuacion=p.id"
+            )[0]->sum;
+            $respuesta->puntuacion = $suma;
+        }
+
+        return $respuestas;
     }
 
     public function store(Request $request)
