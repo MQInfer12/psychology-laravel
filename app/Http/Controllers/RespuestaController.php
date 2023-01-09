@@ -39,23 +39,35 @@ class RespuestaController extends Controller
         }
         
         foreach ($respuestas as $respuesta) {
-            //CONSEGUIR PUNTUACION TOTAL
-            $total = DB::select(
-                "SELECT SUM(pregunta.maximo)
-                 FROM (SELECT MAX(pu.asignado) as maximo
-                    FROM puntuacions as pu, seccions as s, preguntas as pr
-                    WHERE s.id_test='$respuesta->id_test' AND pr.id_seccion=s.id AND pu.id_pregunta=pr.id
-                    GROUP BY pr.id) as pregunta"
-            )[0]->sum;
-            $respuesta->total = $total;
-
-            //CONSEGUIR PUNTUACION DEL TEST
-            $suma = DB::select(
-                "SELECT SUM(p.asignado) 
-                FROM resultados as r, puntuacions as p
-                WHERE r.id_respuesta='$respuesta->id' AND r.id_puntuacion=p.id"
-            )[0]->sum;
-            $respuesta->puntuacion = $suma;
+            $query = DB::select(
+                "SELECT primer.total, segundo.puntuacion
+                FROM (
+                    SELECT COALESCE(SUM(tabla.sumas), 0) as total
+                    FROM (
+                        SELECT SUM(pregunta.punt) as sumas
+                        FROM (
+                            SELECT MAX(pu.asignado) as punt
+                            FROM puntuacions as pu, seccions as s, preguntas as pr
+                            WHERE s.id_test='$respuesta->id_test' AND pr.id_seccion=s.id AND pu.id_pregunta=pr.id AND s.multimarcado=false
+                            GROUP BY pr.id
+                        ) as pregunta
+                        UNION ALL
+                        SELECT SUM(pregunta.punt) as total
+                        FROM (
+                            SELECT SUM(pu.asignado) as punt
+                            FROM puntuacions as pu, seccions as s, preguntas as pr
+                            WHERE s.id_test='$respuesta->id_test' AND pr.id_seccion=s.id AND pu.id_pregunta=pr.id AND s.multimarcado=true
+                            GROUP BY pr.id
+                        ) as pregunta
+                    ) as tabla
+                ) as primer, (
+                    SELECT COALESCE(SUM(p.asignado), 0) as puntuacion
+                    FROM resultados as r, puntuacions as p
+                    WHERE r.id_respuesta='$respuesta->id' AND r.id_puntuacion=p.id
+                ) as segundo"
+            )[0];
+            $respuesta->total = $query->total;
+            $respuesta->puntuacion = $query->puntuacion;
         }
 
         return $respuestas;
