@@ -7,6 +7,7 @@ use App\Http\Controllers\CaracteristicaController;
 use App\Http\Controllers\CitaController;
 use App\Http\Controllers\DimensionController;
 use App\Http\Controllers\DocenteTestController;
+use App\Http\Controllers\EscalaController;
 use App\Http\Controllers\GrupoBeneficiarioController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\HorarioController;
@@ -39,7 +40,7 @@ Route::group(['middleware' => 'api'], function(){
     Route::apiResource("grupo", GrupoController::class);
     Route::get('grupo/docente/{id_docente}', [GrupoController::class, 'indexDocente']);
     Route::put('grupo/able/{id}', [GrupoController::class, 'able']);
-    
+
     //GRUPOBENEFICIARIO ROUTES
     Route::apiResource("grupobeneficiario", GrupoBeneficiarioController::class);
 
@@ -58,8 +59,6 @@ Route::group(['middleware' => 'api'], function(){
     Route::get("test/benefNoAssigning/{id}", [BeneficiarioDocenteController::class, 'getBenefNotAssigning']);
     Route::post("test/AssigningVariosBenef", [BeneficiarioDocenteController::class, 'assignBenefToTest']);
     Route::post("test/deleteBenefAssigning", [BeneficiarioDocenteController::class, 'deleteBenefAssigning']);
-    
-    //DOCENTETESTS ROUTES
 
     //CARACTERISTICAS ROUTES
     Route::apiResource("caracteristica", CaracteristicaController::class);
@@ -68,12 +67,12 @@ Route::group(['middleware' => 'api'], function(){
     //SECCIONES ROUTES
     Route::apiResource("seccion", SeccionController::class);
     Route::get("seccion/test/{idTest}", [SeccionController::class, 'seccionByTest']);
-    
+
     //PREGUNTAS ROUTES
     Route::apiResource("pregunta", PreguntaController::class);
     Route::get("pregunta/seccion/{idSeccion}", [PreguntaController::class, 'preguntasBySeccion']);
     Route::post("pregunta/destroy", [PreguntaController::class, 'massDestroy']);
-    
+
     //REACTIVOS ROUTES
     Route::apiResource("reactivo", ReactivoController::class);
     Route::get("reactivo/seccion/{idSeccion}", [ReactivoController::class, 'reactivosBySeccion']);
@@ -94,21 +93,24 @@ Route::group(['middleware' => 'api'], function(){
     Route::apiResource("dimension", DimensionController::class);
     Route::put("pregunta/dimension/{id}", [PreguntaDimensionController::class, 'storeVarious']);
 
+    //ESCALA ROUTES
+    Route::apiResource("escala", EscalaController::class);
+
     //RESPUESTA ROUTES
     Route::apiResource("respuesta", RespuestaController::class);
     Route::get("respuesta/user/{id}", [RespuestaController::class, 'getRespuestasByUser']);
 
-    //HORARIOS
+    //HORARIOS ROUTES
     Route::apiResource("horario", HorarioController::class);
 
-    //Citas
+    //CITAS ROUTES
     Route::put('cita/schedule/{id_schedule}', [CitaController::class, 'scheduleAppointment']);
     Route::get('cita/horario/{idHorario}', [CitaController::class, 'getAppointmentsByHorario']);
     Route::put('cita/accept/{idHorario}/{idCita}', [CitaController::class, 'scheduleAccept']);
     Route::put('cita/allschedule/{idHorario}/{idCita}', [CitaController::class, 'cancelAppointment']); 
     Route::get('cita/all/{id}', [CitaController::class, 'getHorariosYCitas']);
 
-    //ARTICULOS
+    //ARTICULOS ROUTES
     Route::apiResource("articulo", ArticuloController::class);
     Route::get('articulo/docente/{id_docente}', [ArticuloController::class, 'getArticlesByDocente']);
     Route::get('articulo/documento/{id}', [ArticuloController::class, 'getArticlePdf']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Conversion;
 use App\Models\PreguntaDimension;
 use App\Models\Test;
 use App\Traits\PuntuacionesNaturales;
@@ -37,6 +38,12 @@ class TestController extends Controller
             FROM tests
             WHERE id='$id'"
         )[0];
+        
+        $escalas = DB::select("SELECT * FROM escalas WHERE id_test='$id' ORDER BY id");
+        $idEscalas = array_column($escalas, 'id');
+        $escalaNatural = array("descripcion" => "Natural");
+        array_unshift($escalas, $escalaNatural);
+        $test->escalas = $escalas;
 
         $dimensiones = DB::select("SELECT * FROM dimensions WHERE id_test='$id' ORDER BY id");
         $test->dimensiones = $dimensiones;
@@ -45,8 +52,8 @@ class TestController extends Controller
             $dimension->preguntas = $preguntasPorDimension;
 
             //CALCULAR ESCALA NATURAL DE CADA DIMENSION
-            $natural = $this->getPuntuacionNatural($dimension->id);
-            $dimension->escalas = [array("nombre" => "Natural", "valores" => $natural)];
+            $naturales = $this->getPuntuacionNatural($dimension->id);
+            $dimension->valores = $naturales;
         }
 
         $secciones = DB::select(
@@ -194,3 +201,37 @@ class TestController extends Controller
         }
     }
 }
+
+/* $escala_dimensiones = DB::select("SELECT id FROM escala_dimensions WHERE id_dimension='$dimension->id'");
+
+            $newNaturales = [];
+            foreach($escala_dimensiones as $escala_dimension) {
+                $conversiones = DB::select(
+                    "SELECT c.id, c.natural, c.convertido 
+                    FROM conversions as c 
+                    WHERE id_escala_dimension='$escala_dimension->id' AND c.natural IN (" . implode(',', $numbers) . ")"
+                );
+                foreach($numbers as $number) {
+                    if(in_array($number, array_column($conversiones, 'natural'))) {
+                        $pos = array_search($number, array_column($conversiones, 'natural'));
+                        $conversion = $conversiones[$pos];
+                        $newNaturales[] = array(
+                            "natural" => $number,
+                            "conversion" => array(
+                                "id" => $conversion->id,
+                                "id_escala_dimension" => $escala_dimension->id,
+                                "convertido" => $conversion->convertido
+                            )
+                        );
+                    } else {
+                        $newNaturales[] = array(
+                            "natural" => $number,
+                            "conversion" => array(
+                                "id_escala_dimension" => $escala_dimension->id,
+                                "convertido" => 0
+                            )
+                        );
+                    }
+                }
+            }
+            dd($newNaturales); */

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dimension;
+use App\Models\EscalaDimension;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DimensionController extends Controller
 {
@@ -19,7 +21,15 @@ class DimensionController extends Controller
         $dimension->descripcion = $request->descripcion;
         $dimension->save();
         $dimension->preguntas = [];
-        $dimension->escalas = [array("nombre" => "Natural", "valores" => [])];
+        $dimension->valores = [];
+
+        $escalas = DB::select("SELECT id FROM escalas WHERE id_test='$request->id_test'");
+        foreach($escalas as $escala) {
+            $escala_dimension = new EscalaDimension();
+            $escala_dimension->id_escala = $escala->id;
+            $escala_dimension->id_dimension = $dimension->id;
+            $escala_dimension->save();
+        }
 
         return response()->json(["mensaje" => "se guardo correctamente", "data" => $dimension], 201);
     }
